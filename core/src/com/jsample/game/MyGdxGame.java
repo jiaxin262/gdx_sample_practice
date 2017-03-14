@@ -5,6 +5,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -16,11 +17,14 @@ public class MyGdxGame extends Game {
 
 	private Stage stage;
 	public static Skin skin;
+	public static TextureAtlas textureAtlas;
 
 	@Override
 	public void create () {
 
 		skin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
+		textureAtlas = new TextureAtlas();
+		textureAtlas.addRegion("note", new TextureRegion(new Texture("note.png")));
 		this.setScreen(new TitleScreen(this));
 
 //		stage = new Stage(new ScreenViewport());
@@ -67,5 +71,6 @@ public class MyGdxGame extends Game {
 	@Override
 	public void dispose() {
 		skin.dispose();
+		textureAtlas.dispose();
 	}
 }

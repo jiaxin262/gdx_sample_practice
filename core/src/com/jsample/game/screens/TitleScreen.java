@@ -55,6 +55,23 @@ public class TitleScreen implements Screen {
         });
         stage.addActor(textButton);
 
+        TextButton textButton2 = new TextButton("play2", MyGdxGame.skin);
+        textButton2.setWidth(Gdx.graphics.getWidth() / 3);
+        textButton2.setPosition(Gdx.graphics.getWidth() / 2 - textButton2.getWidth() / 2,
+                Gdx.graphics.getHeight() / 3 - textButton2.getHeight() / 2);
+        textButton2.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new GameScreen2(game));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+        stage.addActor(textButton2);
+
     }
 
     @Override
