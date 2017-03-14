@@ -31,6 +31,7 @@ public class GameScreen implements Screen {
     private float imgWidth, imgHeight;
     private float zoomOffset = 0.01f;
     private float lastDistance, lastInitalDistance;
+    private float minZoom;
 
     public GameScreen(Game game) {
         this.game = game;
@@ -46,9 +47,7 @@ public class GameScreen implements Screen {
         imgWidth = image.getWidth();
         imgHeight = image.getHeight();
         stage.addActor(image);
-
-        Gdx.app.log(TAG, "currentX:" + currentX + ",currentY:" + currentY + ",currentZ:" + currentZ);
-        Gdx.app.log(TAG, "image.getWidth():" + image.getWidth() + ",image.getHeight():" + image.getHeight());
+        minZoom = imgWidth / Gdx.graphics.getWidth();
 
     }
 
@@ -132,17 +131,17 @@ public class GameScreen implements Screen {
         public boolean pan(float x, float y, float deltaX, float deltaY) {
             currentX -= deltaX * currentZ;
             currentY += deltaY * currentZ;
-            if (currentX < Gdx.graphics.getWidth() / 2) {
-                currentX = Gdx.graphics.getWidth() / 2;
+            if (currentX < Gdx.graphics.getWidth() / 2 * currentZ) {
+                currentX = Gdx.graphics.getWidth() / 2 * currentZ;
             }
-            if (currentX > imgWidth - Gdx.graphics.getWidth() / 2) {
-                currentX = imgWidth - Gdx.graphics.getWidth() / 2;
+            if (currentX > imgWidth - Gdx.graphics.getWidth() / 2 * currentZ) {
+                currentX = imgWidth - Gdx.graphics.getWidth() / 2 * currentZ;
             }
-            if (currentY < Gdx.graphics.getHeight() / 2) {
-                currentY = Gdx.graphics.getHeight() / 2;
+            if (currentY < Gdx.graphics.getHeight() / 2 * currentZ) {
+                currentY = Gdx.graphics.getHeight() / 2 * currentZ;
             }
-            if (currentY > imgHeight - Gdx.graphics.getHeight() / 2) {
-                currentY = imgHeight - Gdx.graphics.getHeight() / 2;
+            if (currentY > imgHeight - Gdx.graphics.getHeight() / 2 * currentZ) {
+                currentY = imgHeight - Gdx.graphics.getHeight() / 2 * currentZ;
             }
             return true;
         }
@@ -162,8 +161,8 @@ public class GameScreen implements Screen {
             if (currentZ < 0.3) {
                 currentZ = 0.3f;
             }
-            if (currentZ > 1.8) {
-                currentZ = 1.8f;
+            if (currentZ > minZoom) {
+                currentZ = minZoom;
             }
             lastDistance = distance;
             lastInitalDistance = initialDistance;
