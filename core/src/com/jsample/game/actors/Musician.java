@@ -17,18 +17,24 @@ import com.jsample.game.MyGdxGame;
 public class Musician extends Image {
 
     ParticleEffect effect;
+    ParticleEffect effect2;
 
     public Musician() {
         super(new Texture("musician.png"));
         effect = new ParticleEffect();
         effect.load(Gdx.files.internal("musician.p"), MyGdxGame.textureAtlas);
         effect.start();
+
+        effect2 = new ParticleEffect();
+        effect2.load(Gdx.files.internal("firebomb.p"), Gdx.files.internal("1.png"));
+        //effect2.start();
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         effect.draw(batch);
+        //effect2.draw(batch);
     }
 
     @Override
@@ -36,5 +42,8 @@ public class Musician extends Image {
         super.act(delta);
         effect.setPosition(this.getWidth()+this.getX(),this.getHeight()+this.getY());
         effect.update(delta);
+
+        //effect2.setPosition(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+        //effect2.update(delta);
     }
 }
