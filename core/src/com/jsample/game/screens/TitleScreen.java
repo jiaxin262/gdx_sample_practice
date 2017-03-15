@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -30,22 +31,24 @@ public class TitleScreen implements Screen {
 
     private Stage stage;
     private Game game;
+    private Table table;
 
     public TitleScreen(final Game game) {
         this.game = game;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setCatchBackKey(false);
 
+        table = new Table();
+        table.setFillParent(true);
+        stage.addActor(table);
+        table.setDebug(true);
+
         Label label = new Label("This is Title Screen!", MyGdxGame.skin, "big-black");
         label.setAlignment(Align.center);
-        label.setWidth(Gdx.graphics.getWidth());
-        label.setY(Gdx.graphics.getHeight() * 2 / 3);
-        stage.addActor(label);
+        table.add(label).pad(10);
+        //stage.addActor(label);
 
         TextButton textButton = new TextButton("play", MyGdxGame.skin);
-        textButton.setWidth(Gdx.graphics.getWidth() / 3);
-        textButton.setPosition(Gdx.graphics.getWidth() / 2 - textButton.getWidth() / 2,
-                Gdx.graphics.getHeight() / 2 - textButton.getHeight() / 2);
         textButton.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -57,12 +60,11 @@ public class TitleScreen implements Screen {
                 return true;
             }
         });
-        stage.addActor(textButton);
+        table.row();
+        table.add(textButton).spaceTop(30);
+        //stage.addActor(textButton);
 
         TextButton textButton2 = new TextButton("play2", MyGdxGame.skin);
-        textButton2.setWidth(Gdx.graphics.getWidth() / 3);
-        textButton2.setPosition(Gdx.graphics.getWidth() / 2 - textButton2.getWidth() / 2,
-                Gdx.graphics.getHeight() / 3 - textButton2.getHeight() / 2);
         textButton2.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -74,14 +76,16 @@ public class TitleScreen implements Screen {
                 return true;
             }
         });
-        stage.addActor(textButton2);
+        table.row();
+        table.add(textButton2).spaceTop(30);
+        //stage.addActor(textButton2);
 
         Touchpad touchpad = new Touchpad(20f, new Touchpad.TouchpadStyle(
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_bg.png"))),
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_knob.png")))));
-        touchpad.setPosition(100, 30);
-        touchpad.setSize(400, 400);
-        stage.addActor(touchpad);
+        table.row();
+        table.add(touchpad).width(400).height(400);
+        //stage.addActor(touchpad);
 
 
     }

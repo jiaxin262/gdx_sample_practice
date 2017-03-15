@@ -54,10 +54,10 @@ public class GameScreen2 implements Screen {
         stage.draw();
 
         effect.setEmittersCleanUpBlendFunction(false);
-        MyGdxGame.batch.begin();
-        effect.draw(MyGdxGame.batch, delta);
-        MyGdxGame.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        MyGdxGame.batch.end();
+        stage.getBatch().begin();
+        effect.draw(stage.getBatch(), delta);
+        stage.getBatch().setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        stage.getBatch().end();
     }
 
     @Override
