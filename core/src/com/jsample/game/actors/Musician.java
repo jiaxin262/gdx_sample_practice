@@ -11,6 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.jsample.game.MyGdxGame;
 
@@ -45,5 +46,10 @@ public class Musician extends Image {
 
         //effect2.setPosition(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
         //effect2.update(delta);
+    }
+
+    @Override
+    public Actor hit(float x, float y, boolean touchable) {
+        return super.hit(x, y, touchable);
     }
 }
