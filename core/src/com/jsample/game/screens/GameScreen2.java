@@ -34,8 +34,8 @@ public class GameScreen2 implements Screen {
         stage.addActor(musician);
 
         effect = new ParticleEffect();
-        effect.load(Gdx.files.internal("firebomb.p"), Gdx.files.internal("1.png"));
-        effect.start();
+        effect.load(Gdx.files.internal("fire_note.p"), Gdx.files.internal("note.png"));
+        effect.setPosition(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
     }
 
     @Override
@@ -53,10 +53,10 @@ public class GameScreen2 implements Screen {
         stage.act();
         stage.draw();
 
-        effect.setPosition(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
-        effect.update(delta);
+        effect.setEmittersCleanUpBlendFunction(false);
         MyGdxGame.batch.begin();
-        effect.draw(MyGdxGame.batch);
+        effect.draw(MyGdxGame.batch, delta);
+        MyGdxGame.batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         MyGdxGame.batch.end();
     }
 
@@ -83,6 +83,7 @@ public class GameScreen2 implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        effect.dispose();
     }
 
 }

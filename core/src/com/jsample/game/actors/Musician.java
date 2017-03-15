@@ -23,7 +23,7 @@ public class Musician extends Image {
         super(new Texture("musician.png"));
         effect = new ParticleEffect();
         effect.load(Gdx.files.internal("musician.p"), MyGdxGame.textureAtlas);
-        effect.start();
+        //effect.start();
 
         effect2 = new ParticleEffect();
         effect2.load(Gdx.files.internal("firebomb.p"), Gdx.files.internal("1.png"));
