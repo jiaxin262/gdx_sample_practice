@@ -13,6 +13,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -22,6 +25,14 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
+import com.jsample.game.MyGdxGame;
+import com.jsample.game.model.GreenFace;
+import com.jsample.game.utils.Transform;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameScreen3 implements Screen {
     public static final String TAG = "GameScreen3";
@@ -31,38 +42,51 @@ public class GameScreen3 implements Screen {
     World world;
     Box2DDebugRenderer debugRenderer;
     OrthographicCamera camera;
+    Body body;
     Body body2;
+    Body groundBody;
+    List<Body> bodyList = new ArrayList<Body>();
+    DistanceJoint joint;
+
+    TextureRegion texture;
 
     public GameScreen3(Game game) {
         this.game = game;
         Gdx.input.setCatchBackKey(true);
+
         Box2D.init();
         world = new World(new Vector2(0, -10), true);
         debugRenderer = new Box2DDebugRenderer();
         float cameraWidth = Gdx.graphics.getWidth() / PXTM;
         float cameraHeight = Gdx.graphics.getHeight() / PXTM;
         camera = new OrthographicCamera(cameraWidth, cameraHeight);
-        camera = new OrthographicCamera(cameraWidth, cameraHeight);
+
+        texture = new TextureRegion(new Texture("1111.png"));
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(0, 30.0f / PXTM);
-        Body body = world.createBody(bodyDef);
+        bodyDef.position.set(0, 8);
+        body = world.createBody(bodyDef);
+        Vector2 size = new Vector2(2.0f, 2.0f);
+        GreenFace greenFace = new GreenFace();
+        greenFace.setSize(size);
+        body.setUserData(greenFace);
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(2.0f, 2.0f);
+        polygonShape.setAsBox(size.x, size.y);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
         fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.1f;
         fixtureDef.restitution = 0.5f;
         body.createFixture(fixtureDef);
+        bodyList.add(body);
         polygonShape.dispose();
 
         addWalls();
 
         BodyDef kinematicBodyDef = new BodyDef();
         kinematicBodyDef.type = BodyDef.BodyType.KinematicBody;
-        kinematicBodyDef.position.set(new Vector2(0.5f, -3f));
+        kinematicBodyDef.position.set(new Vector2(0f, 0f));
         Body kinematicBody = world.createBody(kinematicBodyDef);
         CircleShape shape = new CircleShape();
         shape.setRadius(1f);
@@ -74,16 +98,25 @@ public class GameScreen3 implements Screen {
         bodyDef2.type = BodyDef.BodyType.DynamicBody;
         bodyDef2.position.set(-cameraWidth / 2 + 5, -cameraHeight / 2 + 3.5f);
         body2 = world.createBody(bodyDef2);
+        body2.setUserData(new GreenFace());
+        Vector2 sizeVector = new Vector2(2.0f, 2.0f);
+        GreenFace greenFace2 = new GreenFace();
+        greenFace2.setSize(sizeVector);
+        body2.setUserData(greenFace2);
         PolygonShape polygonShape2 = new PolygonShape();
-        polygonShape2.setAsBox(2.0f, 2.0f);
+        polygonShape2.setAsBox(sizeVector.x, sizeVector.y);
         FixtureDef fixtureDef2 = new FixtureDef();
         fixtureDef2.shape = polygonShape2;
         fixtureDef2.density = 0.3f;
         fixtureDef2.friction = 0.1f;
         fixtureDef2.restitution = 0.5f;
         body2.createFixture(fixtureDef2);
+        bodyList.add(body2);
         polygonShape2.dispose();
 
+        DistanceJointDef distanceJointDef = new DistanceJointDef();
+        distanceJointDef.initialize(kinematicBody, body, new Vector2(0, 0), new Vector2(0, 0));
+        joint = (DistanceJoint) world.createJoint(distanceJointDef);
     }
 
     @Override
@@ -101,15 +134,33 @@ public class GameScreen3 implements Screen {
         //body2.applyLinearImpulse(0.5f, 0.5f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
         //body2.applyForceToCenter(10.0f, 0f, true);
         body2.applyForce(40f, 40f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
+        updateGreenFaces();
 
         debugRenderer.render(world, camera.combined);
         world.step(1/45f, 6, 2);
     }
 
+    private void updateGreenFaces() {
+        MyGdxGame.batch.begin();
+        for (Body body : bodyList) {
+            GreenFace greenFace = (GreenFace) body.getUserData();
+            if (greenFace != null) {
+                Gdx.app.log(TAG, "body.getAngle():" + body.getAngle() * MathUtils.radiansToDegrees);
+                Vector2 pos = Transform.mtp(body.getPosition().x, body.getPosition().y, greenFace.getSize(), PXTM);
+                greenFace.setPosition(pos);
+                greenFace.setRotation(MathUtils.radiansToDegrees * body.getAngle());
+                MyGdxGame.batch.draw(texture, greenFace.getPosX(), greenFace.getPosY(),
+                        texture.getTexture().getWidth() / 2, texture.getTexture().getHeight() / 2,
+                        texture.getTexture().getWidth(), texture.getTexture().getHeight(), 1, 1, greenFace.getRotation());
+            }
+        }
+        MyGdxGame.batch.end();
+    }
+
     private void addWalls() {
         BodyDef groundBodyDef =new BodyDef();
         groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight/2 + 1));
-        Body groundBody = world.createBody(groundBodyDef);
+        groundBody = world.createBody(groundBodyDef);
         PolygonShape groundBox = new PolygonShape();
         groundBox.setAsBox(camera.viewportWidth / 2, 0.5f);
         FixtureDef fixtureDef = new FixtureDef();

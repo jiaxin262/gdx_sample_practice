@@ -19,6 +19,7 @@ public class MyGdxGame extends Game {
 	private Stage stage;
 	public static Skin skin;
 	public static TextureAtlas textureAtlas;
+	public static SpriteBatch batch;
 
 	@Override
 	public void create () {
@@ -26,6 +27,7 @@ public class MyGdxGame extends Game {
 		skin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
 		textureAtlas = new TextureAtlas();
 		textureAtlas.addRegion("note", new TextureRegion(new Texture("note.png")));
+		batch = new SpriteBatch();
 		this.setScreen(new TitleScreen(this));
 
 //		stage = new Stage(new ScreenViewport());
