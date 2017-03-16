@@ -22,7 +22,11 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
@@ -56,6 +60,7 @@ public class GameScreen3 implements Screen {
 
         Box2D.init();
         world = new World(new Vector2(0, -10), true);
+        world.setContactListener(new MyContactListener());
         debugRenderer = new Box2DDebugRenderer();
         float cameraWidth = Gdx.graphics.getWidth() / PXTM;
         float cameraHeight = Gdx.graphics.getHeight() / PXTM;
@@ -63,36 +68,36 @@ public class GameScreen3 implements Screen {
 
         texture = new TextureRegion(new Texture("1111.png"));
 
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(0, 8);
-        body = world.createBody(bodyDef);
-        Vector2 size = new Vector2(2.0f, 2.0f);
-        GreenFace greenFace = new GreenFace();
-        greenFace.setSize(size);
-        body.setUserData(greenFace);
-        PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(size.x, size.y);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = polygonShape;
-        fixtureDef.density = 0.5f;
-        fixtureDef.friction = 0.1f;
-        fixtureDef.restitution = 0.5f;
-        body.createFixture(fixtureDef);
-        bodyList.add(body);
-        polygonShape.dispose();
+//        BodyDef bodyDef = new BodyDef();
+//        bodyDef.type = BodyDef.BodyType.DynamicBody;
+//        bodyDef.position.set(0, 8);
+//        body = world.createBody(bodyDef);
+//        Vector2 size = new Vector2(2.0f, 2.0f);
+//        GreenFace greenFace = new GreenFace();
+//        greenFace.setSize(size);
+//        body.setUserData(greenFace);
+//        PolygonShape polygonShape = new PolygonShape();
+//        polygonShape.setAsBox(size.x, size.y);
+//        FixtureDef fixtureDef = new FixtureDef();
+//        fixtureDef.shape = polygonShape;
+//        fixtureDef.density = 0.5f;
+//        fixtureDef.friction = 0.1f;
+//        fixtureDef.restitution = 0.5f;
+//        body.createFixture(fixtureDef);
+//        bodyList.add(body);
+//        polygonShape.dispose();
 
         addWalls();
 
-        BodyDef kinematicBodyDef = new BodyDef();
-        kinematicBodyDef.type = BodyDef.BodyType.KinematicBody;
-        kinematicBodyDef.position.set(new Vector2(0f, 0f));
-        Body kinematicBody = world.createBody(kinematicBodyDef);
-        CircleShape shape = new CircleShape();
-        shape.setRadius(1f);
-        kinematicBody.createFixture(shape, 0);
-        kinematicBody.setLinearVelocity(2.0f, 0.0f);
-        shape.dispose();
+//        BodyDef kinematicBodyDef = new BodyDef();
+//        kinematicBodyDef.type = BodyDef.BodyType.KinematicBody;
+//        kinematicBodyDef.position.set(new Vector2(0f, 0f));
+//        Body kinematicBody = world.createBody(kinematicBodyDef);
+//        CircleShape shape = new CircleShape();
+//        shape.setRadius(1f);
+//        kinematicBody.createFixture(shape, 0);
+//        kinematicBody.setLinearVelocity(2.0f, 0.0f);
+//        shape.dispose();
 
         BodyDef bodyDef2 = new BodyDef();
         bodyDef2.type = BodyDef.BodyType.DynamicBody;
@@ -114,9 +119,9 @@ public class GameScreen3 implements Screen {
         bodyList.add(body2);
         polygonShape2.dispose();
 
-        DistanceJointDef distanceJointDef = new DistanceJointDef();
-        distanceJointDef.initialize(kinematicBody, body, new Vector2(0, 0), new Vector2(0, 0));
-        joint = (DistanceJoint) world.createJoint(distanceJointDef);
+//        DistanceJointDef distanceJointDef = new DistanceJointDef();
+//        distanceJointDef.initialize(kinematicBody, body, new Vector2(0, 0), new Vector2(0, 0));
+        //joint = (DistanceJoint) world.createJoint(distanceJointDef);
     }
 
     @Override
@@ -132,8 +137,8 @@ public class GameScreen3 implements Screen {
             game.setScreen(new TitleScreen(game));
         }
         //body2.applyLinearImpulse(0.5f, 0.5f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
-        //body2.applyForceToCenter(10.0f, 0f, true);
-        body2.applyForce(40f, 40f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
+        body2.applyForceToCenter(40.0f, 10f, true);
+        //body2.applyForce(40f, 40f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
         updateGreenFaces();
 
         debugRenderer.render(world, camera.combined);
@@ -145,7 +150,6 @@ public class GameScreen3 implements Screen {
         for (Body body : bodyList) {
             GreenFace greenFace = (GreenFace) body.getUserData();
             if (greenFace != null) {
-                Gdx.app.log(TAG, "body.getAngle():" + body.getAngle() * MathUtils.radiansToDegrees);
                 Vector2 pos = Transform.mtp(body.getPosition().x, body.getPosition().y, greenFace.getSize(), PXTM);
                 greenFace.setPosition(pos);
                 greenFace.setRotation(MathUtils.radiansToDegrees * body.getAngle());
@@ -220,5 +224,43 @@ public class GameScreen3 implements Screen {
         game.dispose();
         world.dispose();
         debugRenderer.dispose();
+    }
+
+    class MyContactListener implements ContactListener {
+
+        @Override
+        public void beginContact(Contact contact) {
+            GreenFace greenFaceA = (GreenFace) contact.getFixtureA().getBody().getUserData();
+            GreenFace greenFaceB = (GreenFace) contact.getFixtureB().getBody().getUserData();
+            if (greenFaceA != null) {
+                Gdx.app.log(TAG, "a-x,y:" + greenFaceA.getPosX() + "," + greenFaceA.getPosY());
+            }
+            if (greenFaceB != null) {
+                Gdx.app.log(TAG, "b-x,y:" + greenFaceB.getPosX() + "," + greenFaceB.getPosY());
+            }
+
+        }
+
+        @Override
+        public void endContact(Contact contact) {
+            GreenFace greenFaceA = (GreenFace) contact.getFixtureA().getBody().getUserData();
+            GreenFace greenFaceB = (GreenFace) contact.getFixtureB().getBody().getUserData();
+            if (greenFaceA != null) {
+                Gdx.app.log(TAG, "end-a-x,y:" + greenFaceA.getPosX() + "," + greenFaceA.getPosY());
+            }
+            if (greenFaceB != null) {
+                Gdx.app.log(TAG, "end-b-x,y:" + greenFaceB.getPosX() + "," + greenFaceB.getPosY());
+            }
+        }
+
+        @Override
+        public void preSolve(Contact contact, Manifold oldManifold) {
+
+        }
+
+        @Override
+        public void postSolve(Contact contact, ContactImpulse impulse) {
+
+        }
     }
 }
