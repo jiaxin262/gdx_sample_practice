@@ -80,6 +80,20 @@ public class TitleScreen implements Screen {
         table.add(textButton2).spaceTop(30);
         //stage.addActor(textButton2);
 
+        TextButton textButton3 = new TextButton("play3", MyGdxGame.skin);
+        textButton3.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new GameScreen3(game));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+        table.add(textButton3).padTop(30);
+
         Touchpad touchpad = new Touchpad(20f, new Touchpad.TouchpadStyle(
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_bg.png"))),
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_knob.png")))));
@@ -100,7 +114,7 @@ public class TitleScreen implements Screen {
         Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
-
+            game.setScreen(new TitleScreen(game));
         }
 		stage.act();
 		stage.draw();
