@@ -61,7 +61,7 @@ public class TitleScreen implements Screen {
             }
         });
         table.row();
-        table.add(textButton).spaceTop(30);
+        table.add(textButton).spaceTop(10);
         //stage.addActor(textButton);
 
         TextButton textButton2 = new TextButton("play2", MyGdxGame.skin);
@@ -77,7 +77,7 @@ public class TitleScreen implements Screen {
             }
         });
         table.row();
-        table.add(textButton2).spaceTop(30);
+        table.add(textButton2).spaceTop(10);
         //stage.addActor(textButton2);
 
         TextButton textButton3 = new TextButton("play3", MyGdxGame.skin);
@@ -92,13 +92,13 @@ public class TitleScreen implements Screen {
                 return true;
             }
         });
-        table.add(textButton3).padTop(30);
+        table.add(textButton3).padTop(10);
 
         Touchpad touchpad = new Touchpad(20f, new Touchpad.TouchpadStyle(
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_bg.png"))),
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_knob.png")))));
         table.row();
-        table.add(touchpad).width(400).height(400);
+        table.add(touchpad).width(Gdx.graphics.getDensity()*120).height(Gdx.graphics.getDensity()*120);
         //stage.addActor(touchpad);
 
 

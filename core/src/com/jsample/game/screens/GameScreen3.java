@@ -101,7 +101,9 @@ public class GameScreen3 implements Screen {
 
         BodyDef bodyDef2 = new BodyDef();
         bodyDef2.type = BodyDef.BodyType.DynamicBody;
-        bodyDef2.position.set(-cameraWidth / 2 + 5, -cameraHeight / 2 + 3.5f);
+        bodyDef2.position.set(-cameraWidth / 2 + 5, cameraHeight / 2 - 3.5f);
+        //bodyDef2.linearVelocity.set(25f, 15f);
+        bodyDef2.angularVelocity = 25f;
         body2 = world.createBody(bodyDef2);
         body2.setUserData(new GreenFace());
         Vector2 sizeVector = new Vector2(2.0f, 2.0f);
