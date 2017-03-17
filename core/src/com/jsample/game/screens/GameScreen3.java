@@ -15,6 +15,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -36,6 +37,7 @@ import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jsample.game.MyGdxGame;
+import com.jsample.game.actors.Musician;
 import com.jsample.game.model.GreenFace;
 import com.jsample.game.utils.Transform;
 
@@ -58,11 +60,15 @@ public class GameScreen3 implements Screen{
     DistanceJoint joint;
 
     TextureRegion texture;
+    ParticleEffect effect;
 
     public GameScreen3(Game game) {
         this.game = game;
-        stage = new Stage(new ScreenViewport());
         Gdx.input.setCatchBackKey(true);
+        stage = new Stage(new ScreenViewport());
+
+        effect = new ParticleEffect();
+        effect.load(Gdx.files.internal("musician.p"), MyGdxGame.textureAtlas);
 
         Box2D.init();
         world = new World(new Vector2(0, -10), true);
@@ -139,7 +145,7 @@ public class GameScreen3 implements Screen{
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
             game.setScreen(new TitleScreen(game));
@@ -150,14 +156,15 @@ public class GameScreen3 implements Screen{
         updateGreenFaces();
 
         debugRenderer.render(world, camera.combined);
-        world.step(1/45f, 6, 2);
         stage.act();
         stage.draw();
+        world.step(1/45f, 6, 2);
     }
 
     private void updateGreenFaces() {
         MyGdxGame.batch.begin();
-        for (Body body : bodyList) {
+        for (int i = 0; i < bodyList.size(); i++) {
+            Body body = bodyList.get(i);
             GreenFace greenFace = (GreenFace) body.getUserData();
             if (greenFace != null) {
                 Vector2 pos = Transform.mtp(body.getPosition().x, body.getPosition().y, greenFace.getSize(), PXTM);
@@ -166,6 +173,8 @@ public class GameScreen3 implements Screen{
                 MyGdxGame.batch.draw(texture, greenFace.getPosX(), greenFace.getPosY(),
                         texture.getTexture().getWidth() / 2, texture.getTexture().getHeight() / 2,
                         texture.getTexture().getWidth(), texture.getTexture().getHeight(), 1, 1, greenFace.getRotation());
+                effect.setPosition(greenFace.getPosX(),greenFace.getPosY());
+                effect.draw(MyGdxGame.batch, 1/45f);
             }
         }
         MyGdxGame.batch.end();
