@@ -53,6 +53,7 @@ public class GameScreen3 implements Screen{
     World world;
     Box2DDebugRenderer debugRenderer;
     OrthographicCamera camera;
+    OrthographicCamera camera2;
     Body body;
     Body body2;
     Body groundBody;
@@ -61,6 +62,8 @@ public class GameScreen3 implements Screen{
 
     TextureRegion texture;
     ParticleEffect effect;
+
+    float zoomOffset = 0.01f;
 
     public GameScreen3(Game game) {
         this.game = game;
@@ -77,6 +80,7 @@ public class GameScreen3 implements Screen{
         float cameraWidth = Gdx.graphics.getWidth() / PXTM;
         float cameraHeight = Gdx.graphics.getHeight() / PXTM;
         camera = new OrthographicCamera(cameraWidth, cameraHeight);
+        camera2 = (OrthographicCamera) stage.getCamera();
 
         texture = new TextureRegion(new Texture("1111.png"));
 
@@ -153,9 +157,12 @@ public class GameScreen3 implements Screen{
         //body2.applyLinearImpulse(0.5f, 0.5f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
         body2.applyForceToCenter(40.0f, 10f, true);
         //body2.applyForce(40f, 40f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
+
+        //debugRenderer.render(world, camera.combined);
+        MyGdxGame.batch.setProjectionMatrix(camera2.combined);
+
         updateGreenFaces();
 
-        debugRenderer.render(world, camera.combined);
         stage.act();
         stage.draw();
         world.step(1/45f, 6, 2);
@@ -175,6 +182,19 @@ public class GameScreen3 implements Screen{
                         texture.getTexture().getWidth(), texture.getTexture().getHeight(), 1, 1, greenFace.getRotation());
                 effect.setPosition(greenFace.getPosX(),greenFace.getPosY());
                 effect.draw(MyGdxGame.batch, 1/45f);
+                if (i == 1) {
+                    if (pos.x > camera2.position.x) {
+                        camera2.position.x = pos.x;
+                        if (camera2.zoom < 0.5f) {
+                            zoomOffset = 0.01f;
+                        }
+                        if (camera2.zoom > 1.8) {
+                            zoomOffset = -0.01f;
+                        }
+                        camera2.zoom += zoomOffset;
+                        camera2.update();
+                    }
+                }
             }
         }
         MyGdxGame.batch.end();
@@ -185,7 +205,7 @@ public class GameScreen3 implements Screen{
         groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight/2));
         groundBody = world.createBody(groundBodyDef);
         PolygonShape groundBox = new PolygonShape();
-        groundBox.setAsBox(camera.viewportWidth / 2, 0.1f);
+        groundBox.setAsBox(camera.viewportWidth * 4, 0.1f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = groundBox;
         groundBody.createFixture(fixtureDef);
@@ -199,13 +219,13 @@ public class GameScreen3 implements Screen{
         leftWallBody.createFixture(leftWallBox, 0.5f);
         leftWallBox.dispose();
 
-        BodyDef rightWallBodyDef =new BodyDef();
-        rightWallBodyDef.position.set(new Vector2(camera.viewportWidth / 2, 0));
-        Body rightWallBody = world.createBody(rightWallBodyDef);
-        PolygonShape rightWallBox = new PolygonShape();
-        rightWallBox.setAsBox(0.1f, camera.viewportHeight / 2);
-        rightWallBody.createFixture(rightWallBox, 0.5f);
-        rightWallBox.dispose();
+//        BodyDef rightWallBodyDef =new BodyDef();
+//        rightWallBodyDef.position.set(new Vector2(camera.viewportWidth / 2, 0));
+//        Body rightWallBody = world.createBody(rightWallBodyDef);
+//        PolygonShape rightWallBox = new PolygonShape();
+//        rightWallBox.setAsBox(0.1f, camera.viewportHeight / 2);
+//        rightWallBody.createFixture(rightWallBox, 0.5f);
+//        rightWallBox.dispose();
 
         BodyDef topWallBodyDef =new BodyDef();
         topWallBodyDef.position.set(new Vector2(0, camera.viewportHeight/2));
