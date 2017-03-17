@@ -10,6 +10,7 @@ package com.jsample.game.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -25,12 +26,15 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jsample.game.MyGdxGame;
 import com.jsample.game.model.GreenFace;
 import com.jsample.game.utils.Transform;
@@ -38,10 +42,11 @@ import com.jsample.game.utils.Transform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameScreen3 implements Screen {
+public class GameScreen3 implements Screen{
     public static final String TAG = "GameScreen3";
     private static final float PXTM = 30;
 
+    private Stage stage;
     public Game game;
     World world;
     Box2DDebugRenderer debugRenderer;
@@ -56,6 +61,7 @@ public class GameScreen3 implements Screen {
 
     public GameScreen3(Game game) {
         this.game = game;
+        stage = new Stage(new ScreenViewport());
         Gdx.input.setCatchBackKey(true);
 
         Box2D.init();
@@ -68,42 +74,42 @@ public class GameScreen3 implements Screen {
 
         texture = new TextureRegion(new Texture("1111.png"));
 
-//        BodyDef bodyDef = new BodyDef();
-//        bodyDef.type = BodyDef.BodyType.DynamicBody;
-//        bodyDef.position.set(0, 8);
-//        body = world.createBody(bodyDef);
-//        Vector2 size = new Vector2(2.0f, 2.0f);
-//        GreenFace greenFace = new GreenFace();
-//        greenFace.setSize(size);
-//        body.setUserData(greenFace);
-//        PolygonShape polygonShape = new PolygonShape();
-//        polygonShape.setAsBox(size.x, size.y);
-//        FixtureDef fixtureDef = new FixtureDef();
-//        fixtureDef.shape = polygonShape;
-//        fixtureDef.density = 0.5f;
-//        fixtureDef.friction = 0.1f;
-//        fixtureDef.restitution = 0.5f;
-//        body.createFixture(fixtureDef);
-//        bodyList.add(body);
-//        polygonShape.dispose();
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(0, 8);
+        body = world.createBody(bodyDef);
+        Vector2 size = new Vector2(2.0f, 2.0f);
+        GreenFace greenFace = new GreenFace();
+        greenFace.setSize(size);
+        body.setUserData(greenFace);
+        PolygonShape polygonShape = new PolygonShape();
+        polygonShape.setAsBox(size.x, size.y);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = polygonShape;
+        fixtureDef.density = 0.5f;
+        fixtureDef.friction = 0.1f;
+        fixtureDef.restitution = 0.5f;
+        body.createFixture(fixtureDef);
+        bodyList.add(body);
+        polygonShape.dispose();
 
         addWalls();
 
-//        BodyDef kinematicBodyDef = new BodyDef();
-//        kinematicBodyDef.type = BodyDef.BodyType.KinematicBody;
-//        kinematicBodyDef.position.set(new Vector2(0f, 0f));
-//        Body kinematicBody = world.createBody(kinematicBodyDef);
-//        CircleShape shape = new CircleShape();
-//        shape.setRadius(1f);
-//        kinematicBody.createFixture(shape, 0);
-//        kinematicBody.setLinearVelocity(2.0f, 0.0f);
-//        shape.dispose();
+        BodyDef kinematicBodyDef = new BodyDef();
+        kinematicBodyDef.type = BodyDef.BodyType.KinematicBody;
+        kinematicBodyDef.position.set(new Vector2(0f, 0f));
+        Body kinematicBody = world.createBody(kinematicBodyDef);
+        CircleShape shape = new CircleShape();
+        shape.setRadius(1f);
+        kinematicBody.createFixture(shape, 0);
+        kinematicBody.setLinearVelocity(2.0f, 0.0f);
+        shape.dispose();
 
         BodyDef bodyDef2 = new BodyDef();
         bodyDef2.type = BodyDef.BodyType.DynamicBody;
         bodyDef2.position.set(-cameraWidth / 2 + 5, cameraHeight / 2 - 3.5f);
-        //bodyDef2.linearVelocity.set(25f, 15f);
-        bodyDef2.angularVelocity = 25f;
+        bodyDef2.linearVelocity.set(25f, 15f);
+        bodyDef2.angularVelocity = 5f;
         body2 = world.createBody(bodyDef2);
         body2.setUserData(new GreenFace());
         Vector2 sizeVector = new Vector2(2.0f, 2.0f);
@@ -114,21 +120,21 @@ public class GameScreen3 implements Screen {
         polygonShape2.setAsBox(sizeVector.x, sizeVector.y);
         FixtureDef fixtureDef2 = new FixtureDef();
         fixtureDef2.shape = polygonShape2;
-        fixtureDef2.density = 0.3f;
-        fixtureDef2.friction = 0.1f;
-        fixtureDef2.restitution = 0.5f;
+        fixtureDef2.density = 1f;
+        fixtureDef2.friction = 0.3f;
+        fixtureDef2.restitution = 0.9f;
         body2.createFixture(fixtureDef2);
         bodyList.add(body2);
         polygonShape2.dispose();
 
-//        DistanceJointDef distanceJointDef = new DistanceJointDef();
-//        distanceJointDef.initialize(kinematicBody, body, new Vector2(0, 0), new Vector2(0, 0));
-        //joint = (DistanceJoint) world.createJoint(distanceJointDef);
+        DistanceJointDef distanceJointDef = new DistanceJointDef();
+        distanceJointDef.initialize(kinematicBody, body, new Vector2(0, 0), new Vector2(0, 0));
+        joint = (DistanceJoint) world.createJoint(distanceJointDef);
     }
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -145,6 +151,8 @@ public class GameScreen3 implements Screen {
 
         debugRenderer.render(world, camera.combined);
         world.step(1/45f, 6, 2);
+        stage.act();
+        stage.draw();
     }
 
     private void updateGreenFaces() {
@@ -165,36 +173,36 @@ public class GameScreen3 implements Screen {
 
     private void addWalls() {
         BodyDef groundBodyDef =new BodyDef();
-        groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight/2 + 1));
+        groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight/2));
         groundBody = world.createBody(groundBodyDef);
         PolygonShape groundBox = new PolygonShape();
-        groundBox.setAsBox(camera.viewportWidth / 2, 0.5f);
+        groundBox.setAsBox(camera.viewportWidth / 2, 0.1f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = groundBox;
         groundBody.createFixture(fixtureDef);
         groundBox.dispose();
 
         BodyDef leftWallBodyDef =new BodyDef();
-        leftWallBodyDef.position.set(new Vector2(-camera.viewportWidth / 2 + 1, 0));
+        leftWallBodyDef.position.set(new Vector2(-camera.viewportWidth / 2, 0));
         Body leftWallBody = world.createBody(leftWallBodyDef);
         PolygonShape leftWallBox = new PolygonShape();
-        leftWallBox.setAsBox(0.5f, camera.viewportHeight / 2);
+        leftWallBox.setAsBox(0.1f, camera.viewportHeight / 2);
         leftWallBody.createFixture(leftWallBox, 0.5f);
         leftWallBox.dispose();
 
         BodyDef rightWallBodyDef =new BodyDef();
-        rightWallBodyDef.position.set(new Vector2(camera.viewportWidth / 2 - 1, 0));
+        rightWallBodyDef.position.set(new Vector2(camera.viewportWidth / 2, 0));
         Body rightWallBody = world.createBody(rightWallBodyDef);
         PolygonShape rightWallBox = new PolygonShape();
-        rightWallBox.setAsBox(0.5f, camera.viewportHeight / 2);
+        rightWallBox.setAsBox(0.1f, camera.viewportHeight / 2);
         rightWallBody.createFixture(rightWallBox, 0.5f);
         rightWallBox.dispose();
 
         BodyDef topWallBodyDef =new BodyDef();
-        topWallBodyDef.position.set(new Vector2(0, camera.viewportHeight/2 - 1));
+        topWallBodyDef.position.set(new Vector2(0, camera.viewportHeight/2));
         Body topWallBody = world.createBody(topWallBodyDef);
         PolygonShape topWallBox = new PolygonShape();
-        topWallBox.setAsBox(camera.viewportWidth / 2, 0.5f);
+        topWallBox.setAsBox(camera.viewportWidth / 2, 0.1f);
         FixtureDef topWallDef = new FixtureDef();
         topWallDef.shape = topWallBox;
         topWallBody.createFixture(topWallDef);

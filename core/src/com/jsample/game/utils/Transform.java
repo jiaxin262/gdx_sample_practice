@@ -27,4 +27,11 @@ public class Transform {
         vector2.y = y_m * scale + screenHeight / 2 - wh.y * scale;
         return vector2;
     }
+
+    public static int DpToPx(float x) {
+        int result = 0;
+        final float scale = Gdx.graphics.getDensity();
+        result = (int) (x * scale + 0.5f);
+        return result;
+    }
 }
