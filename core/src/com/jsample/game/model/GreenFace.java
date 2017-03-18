@@ -1,10 +1,4 @@
-/************
- * Copyright (C) 2004 - 2017 UCWeb Inc. All Rights Reserved.
- * Description :
- * <p>
- * Creation    : 2017/3/16
- * Author      : jiaxin, jx124336@alibaba-inc.com
- */
+
 package com.jsample.game.model;
 
 import com.badlogic.gdx.math.Vector2;

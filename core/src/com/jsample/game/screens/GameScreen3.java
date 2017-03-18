@@ -1,16 +1,9 @@
-/************
- * Copyright (C) 2004 - 2017 UCWeb Inc. All Rights Reserved.
- * Description :
- * <p>
- * Creation    : 2017/3/16
- * Author      : jiaxin, jx124336@alibaba-inc.com
- */
+
 package com.jsample.game.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -27,7 +20,6 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -37,7 +29,6 @@ import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jsample.game.MyGdxGame;
-import com.jsample.game.actors.Musician;
 import com.jsample.game.model.GreenFace;
 import com.jsample.game.utils.Transform;
 
@@ -59,11 +50,13 @@ public class GameScreen3 implements Screen{
     Body groundBody;
     List<Body> bodyList = new ArrayList<Body>();
     DistanceJoint joint;
+    List<Body> wallList = new ArrayList<Body>();
 
     TextureRegion texture;
     ParticleEffect effect;
 
-    float zoomOffset = 0.01f;
+    float zoomOffset = 0.005f;
+    float totalDistance;
 
     public GameScreen3(Game game) {
         this.game = game;
@@ -149,7 +142,7 @@ public class GameScreen3 implements Screen{
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(0.3f, 0.3f, 0.3f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
             game.setScreen(new TitleScreen(game));
@@ -161,15 +154,21 @@ public class GameScreen3 implements Screen{
         //debugRenderer.render(world, camera.combined);
         MyGdxGame.batch.setProjectionMatrix(camera2.combined);
 
+        MyGdxGame.batch.begin();
         updateGreenFaces();
+        updateWalls();
+        MyGdxGame.batch.end();
 
         stage.act();
         stage.draw();
         world.step(1/45f, 6, 2);
     }
 
+    private void updateWalls() {
+
+    }
+
     private void updateGreenFaces() {
-        MyGdxGame.batch.begin();
         for (int i = 0; i < bodyList.size(); i++) {
             Body body = bodyList.get(i);
             GreenFace greenFace = (GreenFace) body.getUserData();
@@ -197,7 +196,6 @@ public class GameScreen3 implements Screen{
                 }
             }
         }
-        MyGdxGame.batch.end();
     }
 
     private void addWalls() {
@@ -205,7 +203,7 @@ public class GameScreen3 implements Screen{
         groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight/2));
         groundBody = world.createBody(groundBodyDef);
         PolygonShape groundBox = new PolygonShape();
-        groundBox.setAsBox(camera.viewportWidth * 4, 0.1f);
+        groundBox.setAsBox(camera.viewportWidth * 4, 0.3f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = groundBox;
         groundBody.createFixture(fixtureDef);
@@ -215,7 +213,7 @@ public class GameScreen3 implements Screen{
         leftWallBodyDef.position.set(new Vector2(-camera.viewportWidth / 2, 0));
         Body leftWallBody = world.createBody(leftWallBodyDef);
         PolygonShape leftWallBox = new PolygonShape();
-        leftWallBox.setAsBox(0.1f, camera.viewportHeight / 2);
+        leftWallBox.setAsBox(0.3f, camera.viewportHeight / 2);
         leftWallBody.createFixture(leftWallBox, 0.5f);
         leftWallBox.dispose();
 
@@ -231,7 +229,7 @@ public class GameScreen3 implements Screen{
         topWallBodyDef.position.set(new Vector2(0, camera.viewportHeight/2));
         Body topWallBody = world.createBody(topWallBodyDef);
         PolygonShape topWallBox = new PolygonShape();
-        topWallBox.setAsBox(camera.viewportWidth / 2, 0.1f);
+        topWallBox.setAsBox(camera.viewportWidth / 2, 0.3f);
         FixtureDef topWallDef = new FixtureDef();
         topWallDef.shape = topWallBox;
         topWallBody.createFixture(topWallDef);
@@ -272,10 +270,10 @@ public class GameScreen3 implements Screen{
             GreenFace greenFaceA = (GreenFace) contact.getFixtureA().getBody().getUserData();
             GreenFace greenFaceB = (GreenFace) contact.getFixtureB().getBody().getUserData();
             if (greenFaceA != null) {
-                Gdx.app.log(TAG, "a-x,y:" + greenFaceA.getPosX() + "," + greenFaceA.getPosY());
+                //Gdx.app.log(TAG, "a-x,y:" + greenFaceA.getPosX() + "," + greenFaceA.getPosY());
             }
             if (greenFaceB != null) {
-                Gdx.app.log(TAG, "b-x,y:" + greenFaceB.getPosX() + "," + greenFaceB.getPosY());
+                //Gdx.app.log(TAG, "b-x,y:" + greenFaceB.getPosX() + "," + greenFaceB.getPosY());
             }
 
         }
@@ -285,10 +283,10 @@ public class GameScreen3 implements Screen{
             GreenFace greenFaceA = (GreenFace) contact.getFixtureA().getBody().getUserData();
             GreenFace greenFaceB = (GreenFace) contact.getFixtureB().getBody().getUserData();
             if (greenFaceA != null) {
-                Gdx.app.log(TAG, "end-a-x,y:" + greenFaceA.getPosX() + "," + greenFaceA.getPosY());
+                //Gdx.app.log(TAG, "end-a-x,y:" + greenFaceA.getPosX() + "," + greenFaceA.getPosY());
             }
             if (greenFaceB != null) {
-                Gdx.app.log(TAG, "end-b-x,y:" + greenFaceB.getPosX() + "," + greenFaceB.getPosY());
+                //Gdx.app.log(TAG, "end-b-x,y:" + greenFaceB.getPosX() + "," + greenFaceB.getPosY());
             }
         }
 
