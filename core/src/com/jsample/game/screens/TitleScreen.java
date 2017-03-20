@@ -58,6 +58,20 @@ public class TitleScreen implements Screen {
         table.add(textButton).spaceTop(10);
         //stage.addActor(textButton);
 
+        TextButton textButton3 = new TextButton("play3", MyGdxGame.skin);
+        textButton3.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new GameScreen3(game));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+        table.add(textButton3).padTop(10);
+
         TextButton textButton2 = new TextButton("play2", MyGdxGame.skin);
         textButton2.addListener(new InputListener(){
             @Override
@@ -74,11 +88,11 @@ public class TitleScreen implements Screen {
         table.add(textButton2).spaceTop(10);
         //stage.addActor(textButton2);
 
-        TextButton textButton3 = new TextButton("play3", MyGdxGame.skin);
-        textButton3.addListener(new InputListener(){
+        TextButton textButton4 = new TextButton("play4", MyGdxGame.skin);
+        textButton4.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen3(game));
+                game.setScreen(new GameScreen4(game));
             }
 
             @Override
@@ -86,7 +100,7 @@ public class TitleScreen implements Screen {
                 return true;
             }
         });
-        table.add(textButton3).padTop(10);
+        table.add(textButton4).padTop(10);
 
         Touchpad touchpad = new Touchpad(20f, new Touchpad.TouchpadStyle(
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_bg.png"))),
