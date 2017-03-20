@@ -27,6 +27,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jsample.game.MyGdxGame;
 import com.jsample.game.model.GreenFace;
@@ -40,6 +42,7 @@ public class GameScreen3 implements Screen{
     private static final float PXTM = 30;
 
     private Stage stage;
+    private Stage uiStage;
     public Game game;
     World world;
     Box2DDebugRenderer debugRenderer;
@@ -52,19 +55,18 @@ public class GameScreen3 implements Screen{
     DistanceJoint joint;
     List<Body> wallList = new ArrayList<Body>();
 
-    TextureRegion texture;
+    TextureRegion greenFaceTexture;
     ParticleEffect effect;
+    Label distanceTextLabel;
 
-    float zoomOffset = 0.005f;
-    float totalDistance;
+    float currentDistance;
+    float zoomOffset = 0.003f;
 
     public GameScreen3(Game game) {
         this.game = game;
         Gdx.input.setCatchBackKey(true);
         stage = new Stage(new ScreenViewport());
-
-        effect = new ParticleEffect();
-        effect.load(Gdx.files.internal("musician.p"), MyGdxGame.textureAtlas);
+        uiStage = new Stage(new ScreenViewport());
 
         Box2D.init();
         world = new World(new Vector2(0, -10), true);
@@ -75,7 +77,26 @@ public class GameScreen3 implements Screen{
         camera = new OrthographicCamera(cameraWidth, cameraHeight);
         camera2 = (OrthographicCamera) stage.getCamera();
 
-        texture = new TextureRegion(new Texture("1111.png"));
+
+        distanceTextLabel = new Label("distance:0", MyGdxGame.skin, "big");
+        uiStage.addActor(distanceTextLabel);
+        Texture img = new Texture("wall.png");
+        img.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
+		TextureRegion region = new TextureRegion(img);
+		region.setRegion(0, 0, Gdx.graphics.getWidth() * 8, 0.3f * PXTM);
+		Image image = new Image(region);
+		image.setSize(Gdx.graphics.getWidth() * 18, 0.3f * PXTM);
+		image.setPosition(0, 0);
+		stage.addActor(image);
+        Image image4 = new Image(region);
+        image4.setSize(Gdx.graphics.getWidth() * 18, 0.3f * PXTM);
+        image4.setPosition(0, Gdx.graphics.getHeight() - 0.3f * PXTM);
+        stage.addActor(image4);
+
+        effect = new ParticleEffect();
+        effect.load(Gdx.files.internal("musician.p"), MyGdxGame.textureAtlas);
+
+        greenFaceTexture = new TextureRegion(new Texture("1111.png"));
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -124,14 +145,15 @@ public class GameScreen3 implements Screen{
         FixtureDef fixtureDef2 = new FixtureDef();
         fixtureDef2.shape = polygonShape2;
         fixtureDef2.density = 1f;
-        fixtureDef2.friction = 0.3f;
-        fixtureDef2.restitution = 0.9f;
+        fixtureDef2.friction = 0.5f;
+        fixtureDef2.restitution = 0.8f;
         body2.createFixture(fixtureDef2);
         bodyList.add(body2);
         polygonShape2.dispose();
 
         DistanceJointDef distanceJointDef = new DistanceJointDef();
         distanceJointDef.initialize(kinematicBody, body, new Vector2(0, 0), new Vector2(0, 0));
+        distanceJointDef.collideConnected = true;
         joint = (DistanceJoint) world.createJoint(distanceJointDef);
     }
 
@@ -161,6 +183,8 @@ public class GameScreen3 implements Screen{
 
         stage.act();
         stage.draw();
+        uiStage.act();
+        uiStage.draw();
         world.step(1/45f, 6, 2);
     }
 
@@ -176,12 +200,16 @@ public class GameScreen3 implements Screen{
                 Vector2 pos = Transform.mtp(body.getPosition().x, body.getPosition().y, greenFace.getSize(), PXTM);
                 greenFace.setPosition(pos);
                 greenFace.setRotation(MathUtils.radiansToDegrees * body.getAngle());
-                MyGdxGame.batch.draw(texture, greenFace.getPosX(), greenFace.getPosY(),
-                        texture.getTexture().getWidth() / 2, texture.getTexture().getHeight() / 2,
-                        texture.getTexture().getWidth(), texture.getTexture().getHeight(), 1, 1, greenFace.getRotation());
+                MyGdxGame.batch.draw(greenFaceTexture, greenFace.getPosX(), greenFace.getPosY(),
+                        greenFaceTexture.getTexture().getWidth() / 2, greenFaceTexture.getTexture().getHeight() / 2,
+                        greenFaceTexture.getTexture().getWidth(), greenFaceTexture.getTexture().getHeight(), 1, 1, greenFace.getRotation());
                 effect.setPosition(greenFace.getPosX(),greenFace.getPosY());
                 effect.draw(MyGdxGame.batch, 1/45f);
-                if (i == 1) {
+                if (body.getPosition().x - currentDistance > 10) {
+                    currentDistance = body.getPosition().x;
+                    distanceTextLabel.setText("distance:" + MathUtils.floor(currentDistance));
+                }
+                if (i == 0) {
                     if (pos.x > camera2.position.x) {
                         camera2.position.x = pos.x;
                         if (camera2.zoom < 0.5f) {
@@ -203,19 +231,19 @@ public class GameScreen3 implements Screen{
         groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight/2));
         groundBody = world.createBody(groundBodyDef);
         PolygonShape groundBox = new PolygonShape();
-        groundBox.setAsBox(camera.viewportWidth * 4, 0.3f);
+        groundBox.setAsBox(camera.viewportWidth * 18, 0.3f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = groundBox;
         groundBody.createFixture(fixtureDef);
         groundBox.dispose();
 
-        BodyDef leftWallBodyDef =new BodyDef();
-        leftWallBodyDef.position.set(new Vector2(-camera.viewportWidth / 2, 0));
-        Body leftWallBody = world.createBody(leftWallBodyDef);
-        PolygonShape leftWallBox = new PolygonShape();
-        leftWallBox.setAsBox(0.3f, camera.viewportHeight / 2);
-        leftWallBody.createFixture(leftWallBox, 0.5f);
-        leftWallBox.dispose();
+//        BodyDef leftWallBodyDef =new BodyDef();
+//        leftWallBodyDef.position.set(new Vector2(-camera.viewportWidth / 2, 0));
+//        Body leftWallBody = world.createBody(leftWallBodyDef);
+//        PolygonShape leftWallBox = new PolygonShape();
+//        leftWallBox.setAsBox(0.3f, camera.viewportHeight / 2);
+//        leftWallBody.createFixture(leftWallBox, 0.5f);
+//        leftWallBox.dispose();
 
 //        BodyDef rightWallBodyDef =new BodyDef();
 //        rightWallBodyDef.position.set(new Vector2(camera.viewportWidth / 2, 0));
@@ -229,7 +257,7 @@ public class GameScreen3 implements Screen{
         topWallBodyDef.position.set(new Vector2(0, camera.viewportHeight/2));
         Body topWallBody = world.createBody(topWallBodyDef);
         PolygonShape topWallBox = new PolygonShape();
-        topWallBox.setAsBox(camera.viewportWidth / 2, 0.3f);
+        topWallBox.setAsBox(camera.viewportWidth * 18, 0.3f);
         FixtureDef topWallDef = new FixtureDef();
         topWallDef.shape = topWallBox;
         topWallBody.createFixture(topWallDef);
