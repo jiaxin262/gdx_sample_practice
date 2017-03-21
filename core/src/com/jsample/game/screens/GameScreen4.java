@@ -71,7 +71,7 @@ public class GameScreen4 implements Screen {
 
         FixtureDef carFixtureDef = new FixtureDef();
         carFixtureDef.shape = carShape;
-        carFixtureDef.density = 5;
+        carFixtureDef.density = 0.5f;
         carFixtureDef.friction = 1f;
         carFixtureDef.restitution = 0.3f;
         carFixtureDef.filter.groupIndex = -1;
@@ -93,7 +93,7 @@ public class GameScreen4 implements Screen {
         trunkShape.set(trunkVector2s);
         FixtureDef trunkFixtureDef = new FixtureDef();
         trunkFixtureDef.shape = trunkShape;
-        trunkFixtureDef.density = 5;
+        trunkFixtureDef.density = 0.5f;
         trunkFixtureDef.friction = 1f;
         trunkFixtureDef.restitution = 0.3f;
         trunkFixtureDef.filter.groupIndex = -1;
@@ -109,7 +109,7 @@ public class GameScreen4 implements Screen {
         hoodShape.set(hoodVector2s);
         FixtureDef hoodFixtureDef = new FixtureDef();
         hoodFixtureDef.shape = hoodShape;
-        hoodFixtureDef.density = 5;
+        hoodFixtureDef.density = 0.5f;
         hoodFixtureDef.friction = 1f;
         hoodFixtureDef.restitution = 0.3f;
         hoodFixtureDef.filter.groupIndex = -1;
@@ -169,8 +169,8 @@ public class GameScreen4 implements Screen {
 
         /** car-axlesJoint */
         PrismaticJointDef axlesCarPriJointDef = new PrismaticJointDef();
-        axlesCarPriJointDef.lowerTranslation = -carWidth / 8;
-        axlesCarPriJointDef.upperTranslation = carWidth / 32;
+        axlesCarPriJointDef.lowerTranslation = -carWidth / 2;
+        axlesCarPriJointDef.upperTranslation = -carWidth / 8;
         axlesCarPriJointDef.enableLimit = true;
         axlesCarPriJointDef.enableMotor = true;
         axlesCarPriJointDef.initialize(carBody, frontAxlesBody, frontAxlesBody.getWorldCenter(), new Vector2(0, 1));
@@ -205,10 +205,10 @@ public class GameScreen4 implements Screen {
         rearWheelReJoint.setMotorSpeed(-2);
         frontWheelReJoint.setMotorSpeed(-2);
 
-        frontWheelPrJoint.setMaxMotorForce(Math.abs(frontWheelPrJoint.getJointTranslation()*600));
-        frontWheelPrJoint.setMotorSpeed(frontWheelPrJoint.getMotorSpeed() - 2*frontWheelPrJoint.getJointTranslation());
-        rearWheelPrJoint.setMaxMotorForce(Math.abs(rearWheelPrJoint.getJointTranslation()*600));
-        rearWheelPrJoint.setMotorSpeed(rearWheelPrJoint.getMotorSpeed() - 2*rearWheelPrJoint.getJointTranslation());
+//        frontWheelPrJoint.setMaxMotorForce(Math.abs(frontWheelPrJoint.getJointTranslation()*600));
+//        frontWheelPrJoint.setMotorSpeed(frontWheelPrJoint.getMotorSpeed() - 2*frontWheelPrJoint.getJointTranslation());
+//        rearWheelPrJoint.setMaxMotorForce(Math.abs(rearWheelPrJoint.getJointTranslation()*600));
+//        rearWheelPrJoint.setMotorSpeed(rearWheelPrJoint.getMotorSpeed() - 2*rearWheelPrJoint.getJointTranslation());
     }
 
     @Override
