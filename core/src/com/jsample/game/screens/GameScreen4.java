@@ -6,6 +6,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -22,6 +24,9 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.jsample.game.MyGdxGame;
+import com.jsample.game.model.CarModel;
+import com.jsample.game.utils.Transform;
 
 public class GameScreen4 implements Screen {
 
@@ -31,6 +36,10 @@ public class GameScreen4 implements Screen {
     World world;
     Box2DDebugRenderer debugRenderer;
     OrthographicCamera camera;
+    OrthographicCamera debugCamera;
+    Body carBody;
+
+    TextureRegion greenFaceTexture;
 
     RevoluteJoint rearWheelReJoint, frontWheelReJoint;
     PrismaticJoint rearWheelPrJoint, frontWheelPrJoint;
@@ -45,11 +54,13 @@ public class GameScreen4 implements Screen {
         debugRenderer = new Box2DDebugRenderer();
         float cameraWidth = Gdx.graphics.getWidth() / PXTM;
         float cameraHeight = Gdx.graphics.getHeight() / PXTM;
-        camera = new OrthographicCamera(cameraWidth, cameraHeight);
+        camera = (OrthographicCamera) stage.getCamera();
+        debugCamera = new OrthographicCamera(cameraWidth, cameraHeight);
+        greenFaceTexture = new TextureRegion(new Texture("1111.png"));
 
         /** floor */
         PolygonShape floorShape = new PolygonShape();
-        floorShape.setAsBox(cameraWidth / 2, cameraHeight / 16);
+        floorShape.setAsBox(cameraWidth * 4, cameraHeight / 16);
 
         FixtureDef floorFixtureDef = new FixtureDef();
         floorFixtureDef.shape = floorShape;
@@ -58,7 +69,7 @@ public class GameScreen4 implements Screen {
         floorFixtureDef.restitution = 0;
 
         BodyDef floorBodyDef = new BodyDef();
-        floorBodyDef.position.set(0, -cameraHeight / 2);
+        floorBodyDef.position.set(cameraWidth / 2 * 7, -cameraHeight / 2);
         Body floorBody = world.createBody(floorBodyDef);
         Fixture floorFixture = floorBody.createFixture(floorFixtureDef);
         floorShape.dispose();
@@ -79,7 +90,11 @@ public class GameScreen4 implements Screen {
         BodyDef carBodyDef = new BodyDef();
         carBodyDef.type = BodyDef.BodyType.DynamicBody;
         carBodyDef.position.set(-cameraWidth / 4, -cameraHeight / 3);
-        Body carBody = world.createBody(carBodyDef);
+        carBody = world.createBody(carBodyDef);
+        Vector2 carSize = new Vector2(carWidth, carHeight);
+        CarModel carModel = new CarModel();
+        carModel.setSize(carSize);
+        carBody.setUserData(carModel);
         carBody.createFixture(carFixtureDef);
         carShape.dispose();
 
@@ -193,22 +208,39 @@ public class GameScreen4 implements Screen {
             game.setScreen(new TitleScreen(game));
         }
 
-        debugRenderer.render(world, camera.combined);
+        debugRenderer.render(world, debugCamera.combined);
+        MyGdxGame.batch.setProjectionMatrix(camera.combined);
+
+        MyGdxGame.batch.begin();
         updateWheels();
+        updateCamera();
+        MyGdxGame.batch.end();
 
         stage.act();
         stage.draw();
         world.step(1/45f, 6, 2);
     }
 
+    private void updateCamera() {
+        CarModel carModel = (CarModel) carBody.getUserData();
+        if (carModel != null) {
+            Vector2 pos = Transform.mtp(carBody.getPosition().x, carBody.getPosition().y, carModel.getSize(), PXTM);
+            MyGdxGame.batch.draw(greenFaceTexture, pos.x, pos.y);
+            if (pos.x > camera.position.x) {
+                camera.position.x = pos.x;
+                camera.update();
+            }
+        }
+    }
+
     private void updateWheels() {
         rearWheelReJoint.setMotorSpeed(-2);
         frontWheelReJoint.setMotorSpeed(-2);
 
-//        frontWheelPrJoint.setMaxMotorForce(Math.abs(frontWheelPrJoint.getJointTranslation()*600));
-//        frontWheelPrJoint.setMotorSpeed(frontWheelPrJoint.getMotorSpeed() - 2*frontWheelPrJoint.getJointTranslation());
-//        rearWheelPrJoint.setMaxMotorForce(Math.abs(rearWheelPrJoint.getJointTranslation()*600));
-//        rearWheelPrJoint.setMotorSpeed(rearWheelPrJoint.getMotorSpeed() - 2*rearWheelPrJoint.getJointTranslation());
+        frontWheelPrJoint.setMaxMotorForce(Math.abs(frontWheelPrJoint.getJointTranslation()*600));
+        frontWheelPrJoint.setMotorSpeed(frontWheelPrJoint.getMotorSpeed() - 2*frontWheelPrJoint.getJointTranslation());
+        rearWheelPrJoint.setMaxMotorForce(Math.abs(rearWheelPrJoint.getJointTranslation()*600));
+        rearWheelPrJoint.setMotorSpeed(rearWheelPrJoint.getMotorSpeed() - 2*rearWheelPrJoint.getJointTranslation());
     }
 
     @Override

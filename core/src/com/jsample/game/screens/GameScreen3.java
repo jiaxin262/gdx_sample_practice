@@ -173,7 +173,7 @@ public class GameScreen3 implements Screen{
         body2.applyForceToCenter(40.0f, 10f, true);
         //body2.applyForce(40f, 40f, body2.getPosition().x - 0.5f, body2.getPosition().y + 0.5f, false);
 
-        //debugRenderer.render(world, camera.combined);
+        debugRenderer.render(world, camera.combined);
         MyGdxGame.batch.setProjectionMatrix(camera2.combined);
 
         MyGdxGame.batch.begin();
