@@ -105,9 +105,23 @@ public class TitleScreen implements Screen {
         Touchpad touchpad = new Touchpad(20f, new Touchpad.TouchpadStyle(
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_bg.png"))),
                 new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_knob.png")))));
-        table.row();
         table.add(touchpad).width(Gdx.graphics.getDensity()*120).height(Gdx.graphics.getDensity()*120);
         //stage.addActor(touchpad);
+
+        TextButton textButton5 = new TextButton("play5", MyGdxGame.skin);
+        textButton5.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new GameScreen5(game));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+        table.row();
+        table.add(textButton5).padTop(10);
 
 
     }

@@ -35,7 +35,7 @@ import com.jsample.game.model.CarModel;
 import com.jsample.game.utils.Transform;
 
 public class GameScreen4 implements Screen {
-
+    public static final String TAG = "GameScreen4";
     private static final float PXTM = 30;
     private Stage stage;
     private Stage uiStage;
@@ -375,6 +375,7 @@ public class GameScreen4 implements Screen {
 
     @Override
     public void dispose() {
+        Gdx.app.log(TAG, "dispose");
         game.dispose();
         world.dispose();
         debugRenderer.dispose();
