@@ -44,7 +44,7 @@ public class GameScreen5 implements Screen{
     Body bodyBody, headBody, leftArmBody1, leftArmBody2, rightArmBody1, rightArmBody2,
         leftLegBody1, leftLegBody2, rightLegBody1, rightLegBody2;
     RevoluteJoint headBodyRevJoint, leftLegBodyRevJoint, rightLegBodyRevJoint, leftArmBodyRevJoint,
-            rightArmBodyRevJoint, leftLeg1_2BodyRevJoint, rightLeg1_2BodyRevJoint, leftArm1_2BodyRevJoint, rightArm1_2BodyRevJoint;
+            rightArmBodyRevJoint, leftLeg1_2RevJoint, rightLeg1_2RevJoint, leftArm1_2RevJoint, rightArm1_2RevJoint;
     PrismaticJoint headBodyPriJoint;
 
     Touchpad touchpad;
@@ -100,12 +100,12 @@ public class GameScreen5 implements Screen{
         bodyFixtureDef.shape = bodyShape;
         bodyFixtureDef.density = 1f;
         bodyFixtureDef.friction = 1f;
-        bodyFixtureDef.restitution = 0.3f;
+        bodyFixtureDef.restitution = 0.1f;
         bodyFixtureDef.filter.groupIndex = -1;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(-cameraWidth / 4, cameraHeight / 2);
+        bodyDef.position.set(-cameraWidth / 4, 0);
         bodyBody = world.createBody(bodyDef);
         Vector2 bodySize = new Vector2(bodyWidth, bodyHeight);
         BodyModel bodyModel = new BodyModel();
@@ -122,7 +122,7 @@ public class GameScreen5 implements Screen{
         headFixtureDef.shape = headShape;
         headFixtureDef.density = 1f;
         headFixtureDef.friction = 1f;
-        headFixtureDef.restitution = 0.3f;
+        headFixtureDef.restitution = 0.1f;
         headFixtureDef.filter.groupIndex = -1;
 
         BodyDef headBodyDef = new BodyDef();
@@ -138,7 +138,7 @@ public class GameScreen5 implements Screen{
                 bodyBody.getPosition().y + bodyHeight));
         headBodyRevJointDef.enableMotor = true;
         headBodyRevJointDef.enableLimit = true;
-        headBodyRevJointDef.maxMotorTorque = 10000;
+        headBodyRevJointDef.maxMotorTorque = 1000;
         headBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
         headBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
         headBodyRevJoint = (RevoluteJoint) world.createJoint(headBodyRevJointDef);
@@ -150,14 +150,14 @@ public class GameScreen5 implements Screen{
         FixtureDef legFixtureDef = new FixtureDef();
         legFixtureDef.density = 1;
         legFixtureDef.friction = 1;
-        legFixtureDef.restitution = 0.3f;
+        legFixtureDef.restitution = 0.1f;
         legFixtureDef.shape = legArmShape;
         legFixtureDef.filter.groupIndex = -1;
 
         BodyDef legArmBodyDef = new BodyDef();
         legArmBodyDef.type = BodyDef.BodyType.DynamicBody;
 
-        legArmBodyDef.position.set(bodyBody.getPosition().x - bodyWidth, bodyBody.getPosition().y - bodyHeight - bodyHeight / 2);
+        legArmBodyDef.position.set(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight - bodyHeight / 2);
         leftLegBody1 = world.createBody(legArmBodyDef);
         leftLegBody1.createFixture(legFixtureDef);
 
@@ -167,10 +167,11 @@ public class GameScreen5 implements Screen{
                 new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight));
         leftLegBodyRevJointDef.enableMotor = true;
         leftLegBodyRevJointDef.enableLimit = true;
-        leftLegBodyRevJointDef.maxMotorTorque = 10000;
-        leftLegBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        leftLegBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
+        leftLegBodyRevJointDef.maxMotorTorque = 1000;
+        leftLegBodyRevJointDef.lowerAngle = -0.05f * MathUtils.PI;
+        leftLegBodyRevJointDef.upperAngle = 0.05f * MathUtils.PI;
         leftLegBodyRevJoint = (RevoluteJoint) world.createJoint(leftLegBodyRevJointDef);
+        leftLegBodyRevJoint.setMotorSpeed(-1);
 
         /** Body: leftLeg2 */
         legArmBodyDef.position.set(leftLegBody1.getPosition().x, leftLegBody1.getPosition().y - bodyHeight);
@@ -183,13 +184,14 @@ public class GameScreen5 implements Screen{
                 new Vector2(leftLegBody1.getPosition().x, leftLegBody1.getPosition().y - bodyHeight));
         leftLeg1_2RevJointDef.enableMotor = true;
         leftLeg1_2RevJointDef.enableLimit = true;
-        leftLeg1_2RevJointDef.maxMotorTorque = 10000;
-        leftLeg1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        leftLeg1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        leftLeg1_2BodyRevJoint = (RevoluteJoint) world.createJoint(leftLeg1_2RevJointDef);
+        leftLeg1_2RevJointDef.maxMotorTorque = 1000;
+        leftLeg1_2RevJointDef.lowerAngle = -0.1f * MathUtils.PI;
+        leftLeg1_2RevJointDef.upperAngle = 0.1f * MathUtils.PI;
+        leftLeg1_2RevJoint = (RevoluteJoint) world.createJoint(leftLeg1_2RevJointDef);
+        leftLeg1_2RevJoint.setMotorSpeed(-0.5f);
 
         /** Body: rightLeg1 */
-        legArmBodyDef.position.set(bodyBody.getPosition().x + bodyWidth, bodyBody.getPosition().y - bodyHeight - bodyHeight / 2);
+        legArmBodyDef.position.set(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight - bodyHeight / 2);
         rightLegBody1 = world.createBody(legArmBodyDef);
         rightLegBody1.createFixture(legFixtureDef);
 
@@ -199,10 +201,11 @@ public class GameScreen5 implements Screen{
                 new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight));
         rightLegBodyRevJointDef.enableMotor = true;
         rightLegBodyRevJointDef.enableLimit = true;
-        rightLegBodyRevJointDef.maxMotorTorque = 10000;
-        rightLegBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        rightLegBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
+        rightLegBodyRevJointDef.maxMotorTorque = 1000;
+        rightLegBodyRevJointDef.lowerAngle = -0.1f * MathUtils.PI;
+        rightLegBodyRevJointDef.upperAngle = 0.1f * MathUtils.PI;
         rightLegBodyRevJoint = (RevoluteJoint) world.createJoint(rightLegBodyRevJointDef);
+        rightLegBodyRevJoint.setMotorSpeed(1);
 
         /** Body: rightLeg2 */
         legArmBodyDef.position.set(rightLegBody1.getPosition().x, rightLegBody1.getPosition().y - bodyHeight);
@@ -215,13 +218,14 @@ public class GameScreen5 implements Screen{
                 new Vector2(rightLegBody1.getPosition().x, rightLegBody1.getPosition().y - bodyHeight));
         rightLeg1_2RevJointDef.enableMotor = true;
         rightLeg1_2RevJointDef.enableLimit = true;
-        rightLeg1_2RevJointDef.maxMotorTorque = 10000;
+        rightLeg1_2RevJointDef.maxMotorTorque = 1000;
         rightLeg1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
         rightLeg1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        rightLeg1_2BodyRevJoint = (RevoluteJoint) world.createJoint(rightLeg1_2RevJointDef);
+        rightLeg1_2RevJoint = (RevoluteJoint) world.createJoint(rightLeg1_2RevJointDef);
+//        rightLeg1_2RevJoint.setMotorSpeed(-4);
 
         /** Body: leftArm1 */
-        legArmBodyDef.position.set(bodyBody.getPosition().x - bodyWidth - bodyWidth / 2, bodyBody.getPosition().y + bodyWidth);
+        legArmBodyDef.position.set(bodyBody.getPosition().x, bodyBody.getPosition().y + bodyWidth);
         leftArmBody1 = world.createBody(legArmBodyDef);
         leftArmBody1.createFixture(legFixtureDef);
 
@@ -231,7 +235,7 @@ public class GameScreen5 implements Screen{
                 new Vector2(bodyBody.getPosition().x - bodyWidth, bodyBody.getPosition().y + bodyWidth));
         leftArmBodyRevJointDef.enableMotor = true;
         leftArmBodyRevJointDef.enableLimit = true;
-        leftArmBodyRevJointDef.maxMotorTorque = 10000;
+        leftArmBodyRevJointDef.maxMotorTorque = 1000;
         leftArmBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
         leftArmBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
         leftArmBodyRevJoint = (RevoluteJoint) world.createJoint(leftArmBodyRevJointDef);
@@ -247,13 +251,13 @@ public class GameScreen5 implements Screen{
                 new Vector2(leftArmBody1.getPosition().x, leftArmBody1.getPosition().y - bodyHeight));
         leftArm1_2RevJointDef.enableMotor = true;
         leftArm1_2RevJointDef.enableLimit = true;
-        leftArm1_2RevJointDef.maxMotorTorque = 10000;
+        leftArm1_2RevJointDef.maxMotorTorque = 1000;
         leftArm1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
         leftArm1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        leftArm1_2BodyRevJoint = (RevoluteJoint) world.createJoint(leftArm1_2RevJointDef);
+        leftArm1_2RevJoint = (RevoluteJoint) world.createJoint(leftArm1_2RevJointDef);
 
         /** Body: rightArm1 */
-        legArmBodyDef.position.set(bodyBody.getPosition().x + bodyWidth + bodyWidth / 2, bodyBody.getPosition().y + bodyWidth);
+        legArmBodyDef.position.set(bodyBody.getPosition().x, bodyBody.getPosition().y + bodyWidth);
         rightArmBody1 = world.createBody(legArmBodyDef);
         rightArmBody1.createFixture(legFixtureDef);
 
@@ -263,7 +267,7 @@ public class GameScreen5 implements Screen{
                 new Vector2(bodyBody.getPosition().x + bodyWidth, bodyBody.getPosition().y + bodyWidth));
         rightArmBodyRevJointDef.enableMotor = true;
         rightArmBodyRevJointDef.enableLimit = true;
-        rightArmBodyRevJointDef.maxMotorTorque = 10000;
+        rightArmBodyRevJointDef.maxMotorTorque = 1000;
         rightArmBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
         rightArmBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
         rightArmBodyRevJoint = (RevoluteJoint) world.createJoint(rightArmBodyRevJointDef);
@@ -279,10 +283,10 @@ public class GameScreen5 implements Screen{
                 new Vector2(rightArmBody1.getPosition().x, rightArmBody1.getPosition().y - bodyHeight));
         rightArm1_2RevJointDef.enableMotor = true;
         rightArm1_2RevJointDef.enableLimit = true;
-        rightArm1_2RevJointDef.maxMotorTorque = 10000;
+        rightArm1_2RevJointDef.maxMotorTorque = 1000;
         rightArm1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
         rightArm1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        rightArm1_2BodyRevJoint = (RevoluteJoint) world.createJoint(rightArm1_2RevJointDef);
+        rightArm1_2RevJoint = (RevoluteJoint) world.createJoint(rightArm1_2RevJointDef);
 
         legArmShape.dispose();
     }
@@ -311,15 +315,15 @@ public class GameScreen5 implements Screen{
         } else {
             x = y = 0;
         }
-        headBodyRevJoint.setMotorSpeed(x);
-        leftLegBodyRevJoint.setMotorSpeed(x);
-        rightLegBodyRevJoint.setMotorSpeed(-x);
-        leftArmBodyRevJoint.setMotorSpeed(x);
-        rightArmBodyRevJoint.setMotorSpeed(-x);
-        leftLeg1_2BodyRevJoint.setMotorSpeed(x);
-        rightLeg1_2BodyRevJoint.setMotorSpeed(-x);
-        leftArm1_2BodyRevJoint.setMotorSpeed(x);
-        rightArm1_2BodyRevJoint.setMotorSpeed(-x);
+//        headBodyRevJoint.setMotorSpeed(x);
+//        leftLegBodyRevJoint.setMotorSpeed(x);
+//        rightLegBodyRevJoint.setMotorSpeed(-x);
+//        leftArmBodyRevJoint.setMotorSpeed(x);
+//        rightArmBodyRevJoint.setMotorSpeed(-x);
+//        leftLeg1_2RevJoint.setMotorSpeed(x);
+//        rightLeg1_2RevJoint.setMotorSpeed(-x);
+//        leftArm1_2RevJoint.setMotorSpeed(x);
+//        rightArm1_2RevJoint.setMotorSpeed(-x);
 
         stage.act();
         stage.draw();
