@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
@@ -78,16 +79,13 @@ public class GameScreen5 implements Screen{
         PolygonShape floorShape = new PolygonShape();
         floorShape.setAsBox(cameraWidth, cameraHeight / 32);
 
-        FixtureDef floorFixtureDef = new FixtureDef();
-        floorFixtureDef.shape = floorShape;
-        floorFixtureDef.density = 0;
-        floorFixtureDef.friction = 1f;
-        floorFixtureDef.restitution = 0;
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef = configFixtureDef(fixtureDef, 0, 1, 0, floorShape, (short)0);
 
         BodyDef floorBodyDef = new BodyDef();
         floorBodyDef.position.set(0, -cameraHeight / 2);
         Body floorBody = world.createBody(floorBodyDef);
-        Fixture floorFixture = floorBody.createFixture(floorFixtureDef);
+        Fixture floorFixture = floorBody.createFixture(fixtureDef);
         floorShape.dispose();
 
         /** Body: body */
@@ -96,12 +94,7 @@ public class GameScreen5 implements Screen{
         PolygonShape bodyShape = new PolygonShape();
         bodyShape.setAsBox(bodyWidth, bodyHeight);
 
-        FixtureDef bodyFixtureDef = new FixtureDef();
-        bodyFixtureDef.shape = bodyShape;
-        bodyFixtureDef.density = 1f;
-        bodyFixtureDef.friction = 1f;
-        bodyFixtureDef.restitution = 0.3f;
-        bodyFixtureDef.filter.groupIndex = -1;
+        fixtureDef = configFixtureDef(fixtureDef, 1, 1, 0.3f, bodyShape, (short)-1);
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -111,180 +104,147 @@ public class GameScreen5 implements Screen{
         BodyModel bodyModel = new BodyModel();
         bodyModel.setSize(bodySize);
         bodyBody.setUserData(bodyModel);
-        bodyBody.createFixture(bodyFixtureDef);
+        bodyBody.createFixture(fixtureDef);
         bodyShape.dispose();
 
         /** Body: head */
         CircleShape headShape = new CircleShape();
         headShape.setRadius(bodyWidth);
 
-        FixtureDef headFixtureDef = new FixtureDef();
-        headFixtureDef.shape = headShape;
-        headFixtureDef.density = 1f;
-        headFixtureDef.friction = 1f;
-        headFixtureDef.restitution = 0.3f;
-        headFixtureDef.filter.groupIndex = -1;
+        fixtureDef = configFixtureDef(fixtureDef, 1f, 1f, 0.3f, headShape, (short)-1);
 
         BodyDef headBodyDef = new BodyDef();
         headBodyDef.type = BodyDef.BodyType.DynamicBody;
         headBodyDef.position.set(-cameraWidth / 4, bodyBody.getPosition().y + bodyHeight + bodyWidth);
         headBody = world.createBody(headBodyDef);
-        headBody.createFixture(headFixtureDef);
+        headBody.createFixture(fixtureDef);
         headShape.dispose();
 
+        RevoluteJointDef revJointDef = new RevoluteJointDef();
         /** Joint: body-head */
-        RevoluteJointDef headBodyRevJointDef = new RevoluteJointDef();
-        headBodyRevJointDef.initialize(bodyBody, headBody, new Vector2(bodyBody.getPosition().x,
-                bodyBody.getPosition().y + bodyHeight));
-        headBodyRevJointDef.enableMotor = true;
-        headBodyRevJointDef.enableLimit = true;
-        headBodyRevJointDef.maxMotorTorque = 10000;
-        headBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        headBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        headBodyRevJoint = (RevoluteJoint) world.createJoint(headBodyRevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, bodyBody, headBody,
+                new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y + bodyHeight),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        headBodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: leftLeg1 */
         PolygonShape legArmShape = new PolygonShape();
         legArmShape.setAsBox(bodyWidth / 2, bodyHeight / 2);
 
-        FixtureDef legFixtureDef = new FixtureDef();
-        legFixtureDef.density = 1;
-        legFixtureDef.friction = 1;
-        legFixtureDef.restitution = 0.3f;
-        legFixtureDef.shape = legArmShape;
-        legFixtureDef.filter.groupIndex = -1;
+        fixtureDef = configFixtureDef(fixtureDef, 1f, 1f, 0.3f, headShape, (short)-1);
 
         BodyDef legArmBodyDef = new BodyDef();
         legArmBodyDef.type = BodyDef.BodyType.DynamicBody;
-
         legArmBodyDef.position.set(bodyBody.getPosition().x - bodyWidth, bodyBody.getPosition().y - bodyHeight - bodyHeight / 2);
         leftLegBody1 = world.createBody(legArmBodyDef);
-        leftLegBody1.createFixture(legFixtureDef);
+        leftLegBody1.createFixture(fixtureDef);
 
         /** Joint: body-leftLeg */
-        RevoluteJointDef leftLegBodyRevJointDef = new RevoluteJointDef();
-        leftLegBodyRevJointDef.initialize(bodyBody, leftLegBody1,
-                new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight));
-        leftLegBodyRevJointDef.enableMotor = true;
-        leftLegBodyRevJointDef.enableLimit = true;
-        leftLegBodyRevJointDef.maxMotorTorque = 10000;
-        leftLegBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        leftLegBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        leftLegBodyRevJoint = (RevoluteJoint) world.createJoint(leftLegBodyRevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, bodyBody, leftLegBody1,
+                new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        leftLegBodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: leftLeg2 */
         legArmBodyDef.position.set(leftLegBody1.getPosition().x, leftLegBody1.getPosition().y - bodyHeight);
         leftLegBody2 = world.createBody(legArmBodyDef);
-        leftLegBody2.createFixture(legFixtureDef);
+        leftLegBody2.createFixture(fixtureDef);
 
         /** Joint: leftLeg1-leftLeg2 */
-        RevoluteJointDef leftLeg1_2RevJointDef = new RevoluteJointDef();
-        leftLeg1_2RevJointDef.initialize(leftLegBody1, leftLegBody2,
-                new Vector2(leftLegBody1.getPosition().x, leftLegBody1.getPosition().y - bodyHeight));
-        leftLeg1_2RevJointDef.enableMotor = true;
-        leftLeg1_2RevJointDef.enableLimit = true;
-        leftLeg1_2RevJointDef.maxMotorTorque = 10000;
-        leftLeg1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        leftLeg1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        leftLeg1_2BodyRevJoint = (RevoluteJoint) world.createJoint(leftLeg1_2RevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, leftLegBody1, leftLegBody2,
+                new Vector2(leftLegBody1.getPosition().x, leftLegBody1.getPosition().y - bodyHeight),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        leftLeg1_2BodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: rightLeg1 */
         legArmBodyDef.position.set(bodyBody.getPosition().x + bodyWidth, bodyBody.getPosition().y - bodyHeight - bodyHeight / 2);
         rightLegBody1 = world.createBody(legArmBodyDef);
-        rightLegBody1.createFixture(legFixtureDef);
+        rightLegBody1.createFixture(fixtureDef);
 
         /** Joint: body-rightLeg1 */
-        RevoluteJointDef rightLegBodyRevJointDef = new RevoluteJointDef();
-        rightLegBodyRevJointDef.initialize(bodyBody, rightLegBody1,
-                new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight));
-        rightLegBodyRevJointDef.enableMotor = true;
-        rightLegBodyRevJointDef.enableLimit = true;
-        rightLegBodyRevJointDef.maxMotorTorque = 10000;
-        rightLegBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        rightLegBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        rightLegBodyRevJoint = (RevoluteJoint) world.createJoint(rightLegBodyRevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, bodyBody, rightLegBody1,
+                new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y - bodyHeight),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        rightLegBodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: rightLeg2 */
         legArmBodyDef.position.set(rightLegBody1.getPosition().x, rightLegBody1.getPosition().y - bodyHeight);
         rightLegBody2 = world.createBody(legArmBodyDef);
-        rightLegBody2.createFixture(legFixtureDef);
+        rightLegBody2.createFixture(fixtureDef);
 
         /** Joint: rightLeg1-rightLeg2 */
-        RevoluteJointDef rightLeg1_2RevJointDef = new RevoluteJointDef();
-        rightLeg1_2RevJointDef.initialize(rightLegBody1, rightLegBody2,
-                new Vector2(rightLegBody1.getPosition().x, rightLegBody1.getPosition().y - bodyHeight));
-        rightLeg1_2RevJointDef.enableMotor = true;
-        rightLeg1_2RevJointDef.enableLimit = true;
-        rightLeg1_2RevJointDef.maxMotorTorque = 10000;
-        rightLeg1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        rightLeg1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        rightLeg1_2BodyRevJoint = (RevoluteJoint) world.createJoint(rightLeg1_2RevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, rightLegBody1, rightLegBody2,
+                new Vector2(rightLegBody1.getPosition().x, rightLegBody1.getPosition().y - bodyHeight),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        rightLeg1_2BodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: leftArm1 */
         legArmBodyDef.position.set(bodyBody.getPosition().x - bodyWidth - bodyWidth / 2, bodyBody.getPosition().y + bodyWidth);
         leftArmBody1 = world.createBody(legArmBodyDef);
-        leftArmBody1.createFixture(legFixtureDef);
+        leftArmBody1.createFixture(fixtureDef);
 
         /** Joint: body-leftArm1 */
-        RevoluteJointDef leftArmBodyRevJointDef = new RevoluteJointDef();
-        leftArmBodyRevJointDef.initialize(bodyBody, leftArmBody1,
-                new Vector2(bodyBody.getPosition().x - bodyWidth, bodyBody.getPosition().y + bodyWidth));
-        leftArmBodyRevJointDef.enableMotor = true;
-        leftArmBodyRevJointDef.enableLimit = true;
-        leftArmBodyRevJointDef.maxMotorTorque = 10000;
-        leftArmBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        leftArmBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        leftArmBodyRevJoint = (RevoluteJoint) world.createJoint(leftArmBodyRevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, bodyBody, leftArmBody1,
+                new Vector2(bodyBody.getPosition().x - bodyWidth, bodyBody.getPosition().y + bodyWidth),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        leftArmBodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: leftArm2 */
         legArmBodyDef.position.set(leftArmBody1.getPosition().x, leftArmBody1.getPosition().y - bodyHeight);
         leftArmBody2 = world.createBody(legArmBodyDef);
-        leftArmBody2.createFixture(legFixtureDef);
+        leftArmBody2.createFixture(fixtureDef);
 
         /** Joint: leftArm1-leftArm2 */
-        RevoluteJointDef leftArm1_2RevJointDef = new RevoluteJointDef();
-        leftArm1_2RevJointDef.initialize(leftArmBody1, leftArmBody2,
-                new Vector2(leftArmBody1.getPosition().x, leftArmBody1.getPosition().y - bodyHeight));
-        leftArm1_2RevJointDef.enableMotor = true;
-        leftArm1_2RevJointDef.enableLimit = true;
-        leftArm1_2RevJointDef.maxMotorTorque = 10000;
-        leftArm1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        leftArm1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        leftArm1_2BodyRevJoint = (RevoluteJoint) world.createJoint(leftArm1_2RevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, leftArmBody1, leftArmBody2,
+                new Vector2(leftArmBody1.getPosition().x, leftArmBody1.getPosition().y - bodyHeight),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        leftArm1_2BodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: rightArm1 */
         legArmBodyDef.position.set(bodyBody.getPosition().x + bodyWidth + bodyWidth / 2, bodyBody.getPosition().y + bodyWidth);
         rightArmBody1 = world.createBody(legArmBodyDef);
-        rightArmBody1.createFixture(legFixtureDef);
+        rightArmBody1.createFixture(fixtureDef);
 
         /** Joint: body-rightArm1 */
-        RevoluteJointDef rightArmBodyRevJointDef = new RevoluteJointDef();
-        rightArmBodyRevJointDef.initialize(bodyBody, rightArmBody1,
-                new Vector2(bodyBody.getPosition().x + bodyWidth, bodyBody.getPosition().y + bodyWidth));
-        rightArmBodyRevJointDef.enableMotor = true;
-        rightArmBodyRevJointDef.enableLimit = true;
-        rightArmBodyRevJointDef.maxMotorTorque = 10000;
-        rightArmBodyRevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        rightArmBodyRevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        rightArmBodyRevJoint = (RevoluteJoint) world.createJoint(rightArmBodyRevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, bodyBody, rightArmBody1,
+                new Vector2(bodyBody.getPosition().x + bodyWidth, bodyBody.getPosition().y + bodyWidth),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        rightArmBodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         /** Body: rightArm2 */
         legArmBodyDef.position.set(rightArmBody1.getPosition().x, rightArmBody1.getPosition().y - bodyHeight);
         rightArmBody2 = world.createBody(legArmBodyDef);
-        rightArmBody2.createFixture(legFixtureDef);
+        rightArmBody2.createFixture(fixtureDef);
 
         /** Joint: rightArm1-rightArm2 */
-        RevoluteJointDef rightArm1_2RevJointDef = new RevoluteJointDef();
-        rightArm1_2RevJointDef.initialize(rightArmBody1, rightArmBody2,
-                new Vector2(rightArmBody1.getPosition().x, rightArmBody1.getPosition().y - bodyHeight));
-        rightArm1_2RevJointDef.enableMotor = true;
-        rightArm1_2RevJointDef.enableLimit = true;
-        rightArm1_2RevJointDef.maxMotorTorque = 10000;
-        rightArm1_2RevJointDef.lowerAngle = -0.15f * MathUtils.PI;
-        rightArm1_2RevJointDef.upperAngle = 0.15f * MathUtils.PI;
-        rightArm1_2BodyRevJoint = (RevoluteJoint) world.createJoint(rightArm1_2RevJointDef);
+        revJointDef = configRevoluteJointDef(revJointDef, rightArmBody1, rightArmBody2,
+                new Vector2(rightArmBody1.getPosition().x, rightArmBody1.getPosition().y - bodyHeight),
+                true, true, 10000, -0.15f * MathUtils.PI, 0.15f * MathUtils.PI);
+        rightArm1_2BodyRevJoint = (RevoluteJoint) world.createJoint(revJointDef);
 
         legArmShape.dispose();
+    }
+
+    private RevoluteJointDef configRevoluteJointDef(RevoluteJointDef revoluteJointDef, Body body1, Body body2,
+                                                    Vector2 anchor, boolean enableMotor, boolean enableLimit,
+                                                    float maxMotorTorque, float lowerAngle, float upperAngle) {
+        revoluteJointDef.initialize(body1, body2, anchor);
+        revoluteJointDef.enableMotor = enableMotor;
+        revoluteJointDef.enableLimit = enableLimit;
+        revoluteJointDef.maxMotorTorque = maxMotorTorque;
+        revoluteJointDef.lowerAngle = lowerAngle;
+        revoluteJointDef.upperAngle = upperAngle;
+        return revoluteJointDef;
+    }
+
+    private FixtureDef configFixtureDef(FixtureDef fixtureDef, float density, float friction,
+                                        float restitution, Shape shape, short groupIndex) {
+        fixtureDef.density = density;
+        fixtureDef.friction = friction;
+        fixtureDef.restitution = restitution;
+        fixtureDef.shape = shape;
+        fixtureDef.filter.groupIndex = groupIndex;
+        return fixtureDef;
     }
 
     @Override
