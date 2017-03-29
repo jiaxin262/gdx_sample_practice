@@ -7,8 +7,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -20,20 +18,18 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jsample.game.MyGdxGame;
 import com.jsample.game.model.BodyModel;
-import com.jsample.game.utils.Transform;
 
 public class GameScreen5 implements Screen{
+    public static final String TAG = "GameScreen5";
 
     private static final float PXTM = 30;
     private Stage stage;
@@ -52,13 +48,13 @@ public class GameScreen5 implements Screen{
     PrismaticJoint headBodyPriJoint;
     RevoluteJoint platformDistanceJoint, platformDistanceJoint2;
 
-    Touchpad touchpad;
+    Vector2 dragStartPoint, dragStopPoint, draggingPoint;
 
     float x, y;
-    float speed = -9;
     float bodyWidth;
     float bodyHeight;
     boolean isDistanceJointCreated;
+    float shootRadians, jointRadians;
 
     public GameScreen5(Game game) {
         this.game = game;
@@ -73,14 +69,9 @@ public class GameScreen5 implements Screen{
         camera = (OrthographicCamera) stage.getCamera();
         debugCamera = new OrthographicCamera(cameraWidth, cameraHeight);
 
-        touchpad = new Touchpad(Transform.DpToPx(10), new Touchpad.TouchpadStyle(
-                new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_bg.png"))),
-                new TextureRegionDrawable(new TextureRegion(new Texture("touchpad_knob.png")))));
-        touchpad.setSize(Transform.DpToPx(150), Transform.DpToPx(150));
-        touchpad.setPosition(Gdx.graphics.getWidth() - touchpad.getWidth() - Gdx.graphics.getWidth()/15,
-                Gdx.graphics.getHeight() / 15);
-        touchpad.setColor(1, 1, 0, 0.5f);
-        uiStage.addActor(touchpad);
+        dragStartPoint = new Vector2();
+        dragStopPoint = new Vector2();
+        draggingPoint = new Vector2();
 
         /** Body: floor */
         PolygonShape floorShape = new PolygonShape();
@@ -248,7 +239,7 @@ public class GameScreen5 implements Screen{
         /** Joint: body-leftArm1 */
         revoluteJointDef = configRevJointDef(revoluteJointDef, bodyBody, leftArmBody1,
                 new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y + bodyHeight - bodyWidth / 2),
-                true, true, 1000, 0.05f, 0.5f);
+                true, true, 3000, -1f, 1f);
         leftArmBodyRevJoint = (RevoluteJoint) world.createJoint(revoluteJointDef);
 
         /** Body: leftElbow */
@@ -322,6 +313,34 @@ public class GameScreen5 implements Screen{
 
         kneeShape.dispose();
         legArmShape.dispose();
+        uiStage.addCaptureListener(new MyGestureDetector());
+    }
+
+    class MyGestureDetector extends DragListener {
+        @Override
+        public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            return super.touchDown(event, x, y, pointer, button);
+        }
+
+        @Override
+        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            super.touchUp(event, x, y, pointer, button);
+        }
+
+        @Override
+        public void dragStart(InputEvent event, float x, float y, int pointer) {
+            dragStartPoint.set(x, y);
+        }
+
+        @Override
+        public void drag(InputEvent event, float x, float y, int pointer) {
+            draggingPoint.set(x, y);
+        }
+
+        @Override
+        public void dragStop(InputEvent event, float x, float y, int pointer) {
+            dragStopPoint.set(x, y);
+        }
     }
 
     private RevoluteJointDef configRevJointDef(RevoluteJointDef revoluteJointDef, Body body1, Body body2,
@@ -348,15 +367,13 @@ public class GameScreen5 implements Screen{
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK)) {
             game.setScreen(new TitleScreen(game));
         }
-                debugRenderer.render(world, debugCamera.combined);
+        debugRenderer.render(world, debugCamera.combined);
         MyGdxGame.batch.setProjectionMatrix(camera.combined);
 
 //        MyGdxGame.batch.begin();
 //        MyGdxGame.batch.end();
 
-        if (touchpad.isTouched()) {
-            x = touchpad.getKnobPercentX() * speed;
-            y = touchpad.getKnobPercentY() * speed;
+        if (Gdx.input.isTouched()) {
             if (!isDistanceJointCreated) {
                 isDistanceJointCreated = true;
                 /** Joint: platformDistanceJoint1 */
@@ -370,11 +387,31 @@ public class GameScreen5 implements Screen{
                         platformBody.getWorldCenter(), true, true, 1000, 0, 0);
                 platformDistanceJoint2 = (RevoluteJoint) world.createJoint(revoluteJointDef);
             }
+        }
+
+        if (Gdx.input.isTouched()) {
+            shootRadians = MathUtils.atan2(draggingPoint.y - dragStartPoint.y, draggingPoint.x - dragStartPoint.x);
+            if (shootRadians >= -MathUtils.PI && shootRadians <= MathUtils.PI / 2) {
+                shootRadians += MathUtils.PI / 2;
+            } else {
+                shootRadians = -shootRadians;
+            }
+            jointRadians = Math.round(leftArmBodyRevJoint.getJointAngle()*100)/100.0f;
+            shootRadians = Math.round(shootRadians*100)/100.0f;
         } else {
-            x = y = 0;
+            y = 0;
+        }
+        Gdx.app.log(TAG, "leftArmBodyRevJoint.getJointAngle():" + jointRadians);
+        Gdx.app.log(TAG, "degreeToshootRadius:" + shootRadians);
+        if (jointRadians < shootRadians) {
+            y = 1;
+        } else if (jointRadians > shootRadians) {
+            y = -1;
+        } else {
+            y = 0;
         }
         leftArmBodyRevJoint.setMotorSpeed(y);
-        rightArmBodyRevJoint.setMotorSpeed(x);
+//        rightArmBodyRevJoint.setMotorSpeed(x);
 
         stage.act();
         stage.draw();
