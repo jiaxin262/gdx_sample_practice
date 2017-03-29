@@ -44,18 +44,21 @@ public class GameScreen5 implements Screen{
     OrthographicCamera camera;
     OrthographicCamera debugCamera;
     Body bodyBody, headBody, leftArmBody1, leftArmBody2, rightArmBody1, rightArmBody2,
-        leftLegBody1, leftLegBody2, rightLegBody1, rightLegBody2;
+        leftLegBody1, leftLegBody2, rightLegBody1, rightLegBody2, platformBody;
     RevoluteJoint headBodyRevJoint, leftLegBodyRevJoint, rightLegBodyRevJoint, leftArmBodyRevJoint,
             rightArmBodyRevJoint, leftLeg1KneeRevJoint, rightLeg1KneeRevJoint,
             leftLeg2KneeRevJoint, rightLeg2KneeRevJoint, leftArm1ElbowRevJoint, rightArm1ElbowRevJoint,
             leftArm2ElbowRevJoint, rightArm2ElbowRevJoint;
     PrismaticJoint headBodyPriJoint;
-    DistanceJoint platformDistanceJoint;
+    RevoluteJoint platformDistanceJoint, platformDistanceJoint2;
 
     Touchpad touchpad;
 
     float x, y;
     float speed = -9;
+    float bodyWidth;
+    float bodyHeight;
+    boolean isDistanceJointCreated;
 
     public GameScreen5(Game game) {
         this.game = game;
@@ -96,8 +99,8 @@ public class GameScreen5 implements Screen{
         floorShape.dispose();
 
         /** Body: body */
-        float bodyWidth = cameraWidth / 36;
-        float bodyHeight = cameraWidth / 12;
+        bodyWidth = cameraWidth / 36;
+        bodyHeight = cameraWidth / 12;
         PolygonShape bodyShape = new PolygonShape();
         bodyShape.setAsBox(bodyWidth, bodyHeight);
 
@@ -313,14 +316,9 @@ public class GameScreen5 implements Screen{
 
         BodyDef platformBodyDef = new BodyDef();
         platformBodyDef.position.set(bodyBody.getPosition().x, rightLegBody2.getPosition().y - bodyHeight / 2);
-        Body platformBody = world.createBody(platformBodyDef);
+        platformBody = world.createBody(platformBodyDef);
         platformBody.createFixture(platformFixtureDef);
         platformShape.dispose();
-
-        /** Joint: platformDistanceJoint */
-//        DistanceJointDef distanceJointDef = new DistanceJointDef();
-//        distanceJointDef.initialize(platformBody, bodyBody, platformBody.getWorldCenter(), bodyBody.getWorldCenter());
-//        platformDistanceJoint = (DistanceJoint) world.createJoint(distanceJointDef);
 
         kneeShape.dispose();
         legArmShape.dispose();
@@ -359,6 +357,19 @@ public class GameScreen5 implements Screen{
         if (touchpad.isTouched()) {
             x = touchpad.getKnobPercentX() * speed;
             y = touchpad.getKnobPercentY() * speed;
+            if (!isDistanceJointCreated) {
+                isDistanceJointCreated = true;
+                /** Joint: platformDistanceJoint1 */
+                RevoluteJointDef revoluteJointDef = new RevoluteJointDef();
+                revoluteJointDef = configRevJointDef(revoluteJointDef, platformBody, leftLegBody2,
+                        platformBody.getWorldCenter(), true, true, 1000, 0, 0);
+                platformDistanceJoint = (RevoluteJoint) world.createJoint(revoluteJointDef);
+
+                /** Joint: platformDistanceJoint2 */
+                revoluteJointDef = configRevJointDef(revoluteJointDef, platformBody, rightLegBody2,
+                        platformBody.getWorldCenter(), true, true, 1000, 0, 0);
+                platformDistanceJoint2 = (RevoluteJoint) world.createJoint(revoluteJointDef);
+            }
         } else {
             x = y = 0;
         }
