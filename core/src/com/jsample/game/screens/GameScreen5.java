@@ -46,7 +46,7 @@ public class GameScreen5 implements Screen{
             leftLeg2KneeRevJoint, rightLeg2KneeRevJoint, leftArm1ElbowRevJoint, rightArm1ElbowRevJoint,
             leftArm2ElbowRevJoint, rightArm2ElbowRevJoint;
     PrismaticJoint headBodyPriJoint;
-    RevoluteJoint platformDistanceJoint, platformDistanceJoint2;
+    RevoluteJoint platformDistanceJoint, platformDistanceJoint2, platformDistanceJoint3;
 
     Vector2 dragStartPoint, dragStopPoint, draggingPoint;
 
@@ -239,7 +239,7 @@ public class GameScreen5 implements Screen{
         /** Joint: body-leftArm1 */
         revoluteJointDef = configRevJointDef(revoluteJointDef, bodyBody, leftArmBody1,
                 new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y + bodyHeight - bodyWidth / 2),
-                true, true, 3000, -0.9f, 0.9f);
+                true, true, 3000, 0.1f, 0.9f);
         leftArmBodyRevJoint = (RevoluteJoint) world.createJoint(revoluteJointDef);
 
         /** Body: leftElbow */
@@ -319,6 +319,8 @@ public class GameScreen5 implements Screen{
     class MyGestureDetector extends DragListener {
         @Override
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            dragStartPoint.set(0, 0);
+            draggingPoint.set(0, 0);
             return super.touchDown(event, x, y, pointer, button);
         }
 
@@ -376,30 +378,41 @@ public class GameScreen5 implements Screen{
         if (Gdx.input.isTouched()) {
             if (!isDistanceJointCreated) {
                 isDistanceJointCreated = true;
-                /** Joint: platformDistanceJoint1 */
+                /** Joint: platformRevJoint1 */
                 RevoluteJointDef revoluteJointDef = new RevoluteJointDef();
                 revoluteJointDef = configRevJointDef(revoluteJointDef, platformBody, leftLegBody2,
                         platformBody.getWorldCenter(), true, true, 1000, 0, 0);
                 platformDistanceJoint = (RevoluteJoint) world.createJoint(revoluteJointDef);
 
-                /** Joint: platformDistanceJoint2 */
+                /** Joint: platformRevJoint2 */
                 revoluteJointDef = configRevJointDef(revoluteJointDef, platformBody, rightLegBody2,
                         platformBody.getWorldCenter(), true, true, 1000, 0, 0);
                 platformDistanceJoint2 = (RevoluteJoint) world.createJoint(revoluteJointDef);
+
+                /** Joint: platformRevJoint3 */
+                revoluteJointDef = configRevJointDef(revoluteJointDef, platformBody, bodyBody,
+                        platformBody.getWorldCenter(), true, true, 1000, 0, 0);
+                platformDistanceJoint3 = (RevoluteJoint) world.createJoint(revoluteJointDef);
             }
         }
 
-        if (Gdx.input.isTouched()) {
+        if (Gdx.input.isTouched() && Math.abs(draggingPoint.x - dragStartPoint.x) > 50) {
             shootRadians = MathUtils.atan2(draggingPoint.y - dragStartPoint.y, draggingPoint.x - dragStartPoint.x);
             if (shootRadians >= -MathUtils.PI && shootRadians <= MathUtils.PI / 2) {
                 shootRadians += MathUtils.PI / 2;
             } else {
                 shootRadians = shootRadians - MathUtils.PI * 3 / 2;
             }
-            jointRadians = Math.round(leftArmBodyRevJoint.getJointAngle()*100)/100.0f;
-            shootRadians = Math.round(shootRadians*100)/100.0f;
+            jointRadians = Math.round((leftArmBodyRevJoint.getJointAngle()-MathUtils.PI)*10)/10.0f;
+            if (shootRadians > -MathUtils.PI / 10 && shootRadians < MathUtils.PI / 2) {
+                shootRadians = -MathUtils.PI / 10;
+            } else if (shootRadians < -MathUtils.PI * 9 / 10 || shootRadians >= MathUtils.PI / 2) {
+                shootRadians = -MathUtils.PI * 9 / 10;
+            }
+            shootRadians = Math.round(shootRadians * 10) / 10.0f;
         } else {
-            y = 0;
+            jointRadians = 0;
+            shootRadians = 0;
         }
         Gdx.app.log(TAG, "leftArmBodyRevJoint.getJointAngle():" + jointRadians);
         Gdx.app.log(TAG, "degreeToshootRadius:" + shootRadians);
