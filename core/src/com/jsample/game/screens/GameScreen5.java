@@ -54,6 +54,8 @@ public class GameScreen5 implements Screen{
     float bodyWidth;
     float bodyHeight;
     boolean isDistanceJointCreated;
+    boolean isRevJoint3Destroyed;
+    int count;
     float shootRadians, jointRadians;
 
     public GameScreen5(Game game) {
@@ -396,6 +398,20 @@ public class GameScreen5 implements Screen{
             }
         }
 
+        if (Gdx.input.justTouched()) {
+            Gdx.app.log(TAG, "count:" + count);
+            count ++;
+            if (!isRevJoint3Destroyed && count > 3) {
+                isRevJoint3Destroyed = true;
+                world.destroyJoint(platformDistanceJoint3);
+                world.destroyJoint(platformDistanceJoint);
+                world.destroyJoint(platformDistanceJoint2);
+                leftLeg1KneeRevJoint.setLimits(-1f, 1f);
+                leftLeg2KneeRevJoint.setLimits(-1f, 1f);
+                bodyBody.applyLinearImpulse(800, 0, bodyBody.getWorldCenter().x, bodyBody.getWorldCenter().y, true);
+            }
+        }
+
         if (Gdx.input.isTouched() && Math.abs(draggingPoint.x - dragStartPoint.x) > 50) {
             shootRadians = MathUtils.atan2(draggingPoint.y - dragStartPoint.y, draggingPoint.x - dragStartPoint.x);
             if (shootRadians >= -MathUtils.PI && shootRadians <= MathUtils.PI / 2) {
@@ -414,8 +430,8 @@ public class GameScreen5 implements Screen{
             jointRadians = 0;
             shootRadians = 0;
         }
-        Gdx.app.log(TAG, "leftArmBodyRevJoint.getJointAngle():" + jointRadians);
-        Gdx.app.log(TAG, "degreeToshootRadius:" + shootRadians);
+//        Gdx.app.log(TAG, "leftArmBodyRevJoint.getJointAngle():" + jointRadians);
+//        Gdx.app.log(TAG, "degreeToshootRadius:" + shootRadians);
         if (jointRadians < shootRadians) {
             y = 1;
         } else if (jointRadians > shootRadians) {
