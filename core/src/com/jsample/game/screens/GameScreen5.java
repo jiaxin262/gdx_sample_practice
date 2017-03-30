@@ -239,7 +239,7 @@ public class GameScreen5 implements Screen{
         /** Joint: body-leftArm1 */
         revoluteJointDef = configRevJointDef(revoluteJointDef, bodyBody, leftArmBody1,
                 new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y + bodyHeight - bodyWidth / 2),
-                true, true, 3000, -1f, 1f);
+                true, true, 3000, -0.9f, 0.9f);
         leftArmBodyRevJoint = (RevoluteJoint) world.createJoint(revoluteJointDef);
 
         /** Body: leftElbow */
@@ -394,7 +394,7 @@ public class GameScreen5 implements Screen{
             if (shootRadians >= -MathUtils.PI && shootRadians <= MathUtils.PI / 2) {
                 shootRadians += MathUtils.PI / 2;
             } else {
-                shootRadians = -shootRadians;
+                shootRadians = shootRadians - MathUtils.PI * 3 / 2;
             }
             jointRadians = Math.round(leftArmBodyRevJoint.getJointAngle()*100)/100.0f;
             shootRadians = Math.round(shootRadians*100)/100.0f;
