@@ -18,6 +18,8 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
@@ -47,6 +49,7 @@ public class GameScreen5 implements Screen{
             leftArm2ElbowRevJoint, rightArm2ElbowRevJoint;
     PrismaticJoint headBodyPriJoint;
     RevoluteJoint platformDistanceJoint, platformDistanceJoint2, platformDistanceJoint3;
+    DistanceJoint armDistanceJoint;
 
     Vector2 dragStartPoint, dragStopPoint, draggingPoint;
 
@@ -272,9 +275,9 @@ public class GameScreen5 implements Screen{
         /** Joint: body-rightArm1 */
         revoluteJointDef = configRevJointDef(revoluteJointDef, bodyBody, rightArmBody1,
                 new Vector2(bodyBody.getPosition().x, bodyBody.getPosition().y + bodyHeight - bodyWidth / 2),
-                true, true, 1000, -0.5f, 0.1f);
+                true, true, 1000, -0.9f, 0.9f);
         rightArmBodyRevJoint = (RevoluteJoint) world.createJoint(revoluteJointDef);
-//        rightArmBodyRevJoint.setMotorSpeed(-0.5f);
+//        rightArmBodyRevJoint.setMotorSpeed(0.5f);
 
         /** Body: rightElbow */
         kneeBodyDef.position.set(rightArmBody1.getPosition().x, rightArmBody1.getPosition().y - bodyHeight / 2);
@@ -293,7 +296,7 @@ public class GameScreen5 implements Screen{
 
         /** Joint: rightArm2-elbow */
         revoluteJointDef = configRevJointDef(revoluteJointDef, rightArmBody2, rightElbowBody,
-                rightElbowBody.getWorldCenter(), true, true, 3000, -0.8f, 0.1f);
+                rightElbowBody.getWorldCenter(), true, true, 3000, -0.9f, -0.2f);
         rightArm2ElbowRevJoint = (RevoluteJoint) world.createJoint(revoluteJointDef);
 //        rightArm2ElbowRevJoint.setMotorSpeed(-1f);
 
@@ -395,22 +398,30 @@ public class GameScreen5 implements Screen{
                 revoluteJointDef = configRevJointDef(revoluteJointDef, platformBody, bodyBody,
                         platformBody.getWorldCenter(), true, true, 1000, 0, 0);
                 platformDistanceJoint3 = (RevoluteJoint) world.createJoint(revoluteJointDef);
+
+                /** Joint: armDistanceJoint */
+                DistanceJointDef distanceJointDef = new DistanceJointDef();
+                distanceJointDef.initialize(leftArmBody2, rightArmBody2, leftArmBody2.getWorldCenter(),
+                        leftArmBody2.getWorldCenter());
+                armDistanceJoint = (DistanceJoint) world.createJoint(distanceJointDef);
+
             }
+            Gdx.app.log(TAG, "armDistanceJoint.getLength():" + armDistanceJoint.getLength());
         }
 
-        if (Gdx.input.justTouched()) {
-            Gdx.app.log(TAG, "count:" + count);
-            count ++;
-            if (!isRevJoint3Destroyed && count > 3) {
-                isRevJoint3Destroyed = true;
-                world.destroyJoint(platformDistanceJoint3);
-                world.destroyJoint(platformDistanceJoint);
-                world.destroyJoint(platformDistanceJoint2);
-                leftLeg1KneeRevJoint.setLimits(-1f, 1f);
-                leftLeg2KneeRevJoint.setLimits(-1f, 1f);
-                bodyBody.applyLinearImpulse(800, 0, bodyBody.getWorldCenter().x, bodyBody.getWorldCenter().y, true);
-            }
-        }
+//        if (Gdx.input.justTouched()) {
+//            Gdx.app.log(TAG, "count:" + count);
+//            count ++;
+//            if (!isRevJoint3Destroyed && count > 3) {
+//                isRevJoint3Destroyed = true;
+//                world.destroyJoint(platformDistanceJoint3);
+//                world.destroyJoint(platformDistanceJoint);
+//                world.destroyJoint(platformDistanceJoint2);
+//                leftLeg1KneeRevJoint.setLimits(-1f, 1f);
+//                leftLeg2KneeRevJoint.setLimits(-1f, 1f);
+//                bodyBody.applyLinearImpulse(800, 0, bodyBody.getWorldCenter().x, bodyBody.getWorldCenter().y, true);
+//            }
+//        }
 
         if (Gdx.input.isTouched() && Math.abs(draggingPoint.x - dragStartPoint.x) > 50) {
             shootRadians = MathUtils.atan2(draggingPoint.y - dragStartPoint.y, draggingPoint.x - dragStartPoint.x);
