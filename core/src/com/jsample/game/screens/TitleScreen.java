@@ -123,6 +123,19 @@ public class TitleScreen implements Screen {
         table.row();
         table.add(textButton5).padTop(10);
 
+        TextButton textButton6 = new TextButton("play6", MyGdxGame.skin);
+        textButton6.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                game.setScreen(new GameScreen6(game));
+            }
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
+        table.add(textButton6).padTop(10);
 
     }
 
