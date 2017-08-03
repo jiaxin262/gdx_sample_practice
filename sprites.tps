@@ -6,7 +6,7 @@
         <key>texturePackerVersion</key>
         <string>4.4.0</string>
         <key>fileName</key>
-        <string>/Users/jiaxin/projects/libGDXProjects/archers/sprites.tps</string>
+        <string>/Users/jiaxin/projects/libGDXProjects/gdx_sample_practice/sprites.tps</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -36,7 +36,7 @@
         <key>dataFormat</key>
         <string>libgdx</string>
         <key>textureFileName</key>
-        <filename>android/assets/sprites.png</filename>
+        <filename></filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrCompressionQuality</key>
@@ -150,7 +150,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>android/assets/sprites.txt</filename>
+                <filename>android/assets/fruits/sprites.txt</filename>
             </struct>
         </map>
         <key>multiPack</key>
@@ -199,10 +199,14 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">raw-assets/banana.png</key>
-            <key type="filename">raw-assets/cherries.png</key>
-            <key type="filename">raw-assets/crate.png</key>
-            <key type="filename">raw-assets/orange.png</key>
+            <key type="filename">raw-assets/gameobjects/banana.png</key>
+            <key type="filename">raw-assets/gameobjects/cherries.png</key>
+            <key type="filename">raw-assets/gameobjects/crate.png</key>
+            <key type="filename">raw-assets/gameobjects/orange.png</key>
+            <key type="filename">raw-assets/normals/banana.png</key>
+            <key type="filename">raw-assets/normals/cherries.png</key>
+            <key type="filename">raw-assets/normals/crate.png</key>
+            <key type="filename">raw-assets/normals/orange.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -231,7 +235,7 @@
         <key>commonDivisorY</key>
         <uint>1</uint>
         <key>packNormalMaps</key>
-        <false/>
+        <true/>
         <key>autodetectNormalMaps</key>
         <true/>
         <key>normalMapFilter</key>
