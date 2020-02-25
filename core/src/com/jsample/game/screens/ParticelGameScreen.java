@@ -20,8 +20,8 @@ import com.jsample.game.utils.Transform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameScreen2 implements Screen {
-    public static final String TAG = "GameScreen2";
+public class ParticelGameScreen implements Screen {
+    public static final String TAG = "ParticelGameScreen";
 
     private Game game;
     private Stage stage;
@@ -50,7 +50,7 @@ public class GameScreen2 implements Screen {
     int randomX = 0;
     int randomY = 0;
 
-    public GameScreen2(Game game) {
+    public ParticelGameScreen(Game game) {
         this.game = game;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setCatchBackKey(true);

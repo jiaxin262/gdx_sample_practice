@@ -37,8 +37,8 @@ import com.jsample.game.utils.Transform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameScreen3 implements Screen{
-    public static final String TAG = "GameScreen3";
+public class GreenGameScreen implements Screen {
+    public static final String TAG = "GreenGameScreen";
     private static final float PXTM = 30;
 
     private Stage stage;
@@ -62,7 +62,7 @@ public class GameScreen3 implements Screen{
     float currentDistance;
     float zoomOffset = 0.003f;
 
-    public GameScreen3(Game game) {
+    public GreenGameScreen(Game game) {
         this.game = game;
         Gdx.input.setCatchBackKey(true);
         stage = new Stage(new ScreenViewport());
@@ -82,12 +82,12 @@ public class GameScreen3 implements Screen{
         uiStage.addActor(distanceTextLabel);
         Texture img = new Texture("wall.png");
         img.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
-		TextureRegion region = new TextureRegion(img);
-		region.setRegion(0, 0, Gdx.graphics.getWidth() * 8, 0.3f * PXTM);
-		Image image = new Image(region);
-		image.setSize(Gdx.graphics.getWidth() * 18, 0.3f * PXTM);
-		image.setPosition(0, 0);
-		stage.addActor(image);
+        TextureRegion region = new TextureRegion(img);
+        region.setRegion(0, 0, Gdx.graphics.getWidth() * 8, 0.3f * PXTM);
+        Image image = new Image(region);
+        image.setSize(Gdx.graphics.getWidth() * 18, 0.3f * PXTM);
+        image.setPosition(0, 0);
+        stage.addActor(image);
         Image image4 = new Image(region);
         image4.setSize(Gdx.graphics.getWidth() * 18, 0.3f * PXTM);
         image4.setPosition(0, Gdx.graphics.getHeight() - 0.3f * PXTM);
@@ -185,7 +185,7 @@ public class GameScreen3 implements Screen{
         stage.draw();
         uiStage.act();
         uiStage.draw();
-        world.step(1/45f, 6, 2);
+        world.step(1 / 45f, 6, 2);
     }
 
     private void updateWalls() {
@@ -203,8 +203,8 @@ public class GameScreen3 implements Screen{
                 MyGdxGame.batch.draw(greenFaceTexture, greenFace.getPosX(), greenFace.getPosY(),
                         greenFaceTexture.getTexture().getWidth() / 2, greenFaceTexture.getTexture().getHeight() / 2,
                         greenFaceTexture.getTexture().getWidth(), greenFaceTexture.getTexture().getHeight(), 1, 1, greenFace.getRotation());
-                effect.setPosition(greenFace.getPosX(),greenFace.getPosY());
-                effect.draw(MyGdxGame.batch, 1/45f);
+                effect.setPosition(greenFace.getPosX(), greenFace.getPosY());
+                effect.draw(MyGdxGame.batch, 1 / 45f);
                 if (body.getPosition().x - currentDistance > 10) {
                     currentDistance = body.getPosition().x;
                     distanceTextLabel.setText("distance:" + MathUtils.floor(currentDistance));
@@ -227,8 +227,8 @@ public class GameScreen3 implements Screen{
     }
 
     private void addWalls() {
-        BodyDef groundBodyDef =new BodyDef();
-        groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight/2));
+        BodyDef groundBodyDef = new BodyDef();
+        groundBodyDef.position.set(new Vector2(0, -camera.viewportHeight / 2));
         groundBody = world.createBody(groundBodyDef);
         PolygonShape groundBox = new PolygonShape();
         groundBox.setAsBox(camera.viewportWidth * 18, 0.3f);
@@ -253,8 +253,8 @@ public class GameScreen3 implements Screen{
 //        rightWallBody.createFixture(rightWallBox, 0.5f);
 //        rightWallBox.dispose();
 
-        BodyDef topWallBodyDef =new BodyDef();
-        topWallBodyDef.position.set(new Vector2(0, camera.viewportHeight/2));
+        BodyDef topWallBodyDef = new BodyDef();
+        topWallBodyDef.position.set(new Vector2(0, camera.viewportHeight / 2));
         Body topWallBody = world.createBody(topWallBodyDef);
         PolygonShape topWallBox = new PolygonShape();
         topWallBox.setAsBox(camera.viewportWidth * 18, 0.3f);

@@ -33,8 +33,8 @@ import com.jsample.game.model.BodyModel;
 import com.jsample.game.utils.FixtureDefBuilder;
 import com.jsample.game.utils.RevoluteJointDefBuilder;
 
-public class GameScreen5 implements Screen{
-    public static final String TAG = "GameScreen5";
+public class JointGameScreen implements Screen{
+    public static final String TAG = "JointGameScreen";
 
     public static final float PXTM = 30;
     private Stage stage;
@@ -55,7 +55,7 @@ public class GameScreen5 implements Screen{
     int count;
     float shootRadians, jointRadians;
 
-    public GameScreen5(Game game) {
+    public JointGameScreen(Game game) {
         this.game = game;
         Gdx.input.setCatchBackKey(true);
         stage = new Stage(new ScreenViewport());

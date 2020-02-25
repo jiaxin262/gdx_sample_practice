@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.joints.PrismaticJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.jsample.game.model.BodyModel;
-import com.jsample.game.screens.GameScreen5;
+import com.jsample.game.screens.JointGameScreen;
 import com.jsample.game.utils.FixtureDefBuilder;
 import com.jsample.game.utils.RevoluteJointDefBuilder;
 
@@ -38,8 +38,8 @@ public class BodyManager {
 
     public BodyManager(World world) {
         this.world = world;
-        cameraWidth = Gdx.graphics.getWidth() / GameScreen5.PXTM;
-        cameraHeight = Gdx.graphics.getHeight() / GameScreen5.PXTM;
+        cameraWidth = Gdx.graphics.getWidth() / JointGameScreen.PXTM;
+        cameraHeight = Gdx.graphics.getHeight() / JointGameScreen.PXTM;
 
         /** Body: floor */
         PolygonShape floorShape = getBoxShape(cameraWidth, cameraHeight / 32);

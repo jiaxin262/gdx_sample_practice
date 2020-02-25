@@ -46,7 +46,7 @@ public class TitleScreen implements Screen {
         textButton.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen(game));
+                game.setScreen(new MapGameScreen(game));
             }
 
             @Override
@@ -62,7 +62,7 @@ public class TitleScreen implements Screen {
         textButton3.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen3(game));
+                game.setScreen(new GreenGameScreen(game));
             }
 
             @Override
@@ -76,7 +76,7 @@ public class TitleScreen implements Screen {
         textButton2.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen2(game));
+                game.setScreen(new ParticelGameScreen(game));
             }
 
             @Override
@@ -92,7 +92,7 @@ public class TitleScreen implements Screen {
         textButton4.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen4(game));
+                game.setScreen(new CarGameScreen(game));
             }
 
             @Override
@@ -112,7 +112,7 @@ public class TitleScreen implements Screen {
         textButton5.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen5(game));
+                game.setScreen(new JointGameScreen(game));
             }
 
             @Override
@@ -127,7 +127,7 @@ public class TitleScreen implements Screen {
         textButton6.addListener(new InputListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new GameScreen6(game));
+                game.setScreen(new FruitGameScreen(game));
             }
 
             @Override

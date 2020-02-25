@@ -26,7 +26,7 @@ import com.jsample.game.MyGdxGame;
 import java.util.HashMap;
 import java.util.Random;
 
-public class GameScreen6 implements Screen {
+public class FruitGameScreen implements Screen {
 
     public Game mGame;
     private Stage stage;
@@ -52,7 +52,7 @@ public class GameScreen6 implements Screen {
 
     private float mAccumulator = 0;
 
-    public GameScreen6(Game game) {
+    public FruitGameScreen(Game game) {
         this.mGame = game;
         Gdx.input.setCatchBackKey(true);
         Box2D.init();

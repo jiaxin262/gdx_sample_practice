@@ -34,8 +34,8 @@ import com.jsample.game.model.BaseBodyModel;
 import com.jsample.game.model.CarModel;
 import com.jsample.game.utils.Transform;
 
-public class GameScreen4 implements Screen {
-    public static final String TAG = "GameScreen4";
+public class CarGameScreen implements Screen {
+    public static final String TAG = "CarGameScreen";
     private static final float PXTM = 30;
     private Stage stage;
     private Stage uiStage;
@@ -59,7 +59,7 @@ public class GameScreen4 implements Screen {
     float x, y;
     float speed = -9;
 
-    public GameScreen4(Game game) {
+    public CarGameScreen(Game game) {
         this.game = game;
         Gdx.input.setCatchBackKey(true);
         stage = new Stage(new ScreenViewport());

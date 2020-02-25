@@ -21,8 +21,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.jsample.game.MyGdxGame;
 
-public class GameScreen implements Screen {
-    public static final String TAG = "GameScreen";
+public class MapGameScreen implements Screen {
+    public static final String TAG = "MapGameScreen";
 
     private Game game;
     private Stage stage;
@@ -37,7 +37,7 @@ public class GameScreen implements Screen {
     private float lastDistance, lastInitalDistance;
     private float minZoom;
 
-    public GameScreen(Game game) {
+    public MapGameScreen(Game game) {
         this.game = game;
         stage = new Stage(new ScreenViewport());
         uiStage = new Stage(new ScreenViewport());
